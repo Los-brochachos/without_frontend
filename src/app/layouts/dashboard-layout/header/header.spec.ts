@@ -27,6 +27,15 @@ describe('Header compartido', () => {
     usuario.set({ rol: 'CLIENTE', correo: 'cliente@example.com' });
     expect(fixture.componentInstance.items()[0].routerLink).toBe('/cliente/perfil');
   });
+  it('personal: Mi perfil, Seguridad y Preferencias apuntan a rutas del dashboard; sin centro de ayuda', async () => {
+    const { fixture } = await setup('CONDUCTOR');
+    const opciones = fixture.componentInstance.items().filter(i => i.label).map(i => `${i.label}${i.routerLink ? ' → ' + i.routerLink : ''}`);
+    expect(opciones).toEqual(['Mi perfil → /dashboard/perfil', 'Seguridad → /dashboard/seguridad', 'Preferencias → /dashboard/preferencias', 'Cerrar sesión']);
+  });
+  it('cliente conserva su centro de ayuda', async () => {
+    const { fixture } = await setup('CLIENTE');
+    expect(fixture.componentInstance.items().map(i => i.label)).toContain('Centro de ayuda');
+  });
   it('ambos portales esperan confirmación del logout antes de navegar', async () => {
     const { fixture, result } = await setup('CLIENTE');
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);

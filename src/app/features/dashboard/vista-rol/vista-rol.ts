@@ -4,8 +4,12 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, combineLatest, distinctUntilChanged, from, map, of, switchMap, tap } from 'rxjs';
 import { Auth } from '../../../core/auth/auth';
+import { seccionDe } from '../dashboard-data';
 
-/** El router conserva este contenedor, pero cada sesión selecciona su propia vista. */
+/**
+ * El router conserva este contenedor y cada rol ve su propia pantalla.
+ * Qué pantalla abre cada rol se define en dashboard-data.ts (campo `pantalla`); no hay `if` por rol aquí.
+ */
 @Component({
   selector: 'app-vista-rol', imports: [NgComponentOutlet],
   template: `@if (error()) { <p role="alert" class="p-6 text-red-700">{{ error() }}</p> }
@@ -30,15 +34,11 @@ export class VistaRol {
     ).subscribe(componente => this.componente.set(componente));
   }
   private cargar(vista: string, rol: string): Promise<Type<unknown>> {
+    // El resumen de inicio es la única vista que no es un módulo del menú.
     if (vista === 'inicio') return rol === 'PROGRAMADOR'
-      ? import('../../trabajador/programador/inicio/inicio').then(m => m.InicioProgramador)
-      : import('../dashboard').then(m => m.Dashboard);
-    if (vista === 'pedidos' && rol === 'PROGRAMADOR')
-      return import('../../trabajador/programador/pedidos/pedidos').then(m => m.PedidosProgramador);
-    if (vista === 'atenciones' && rol === 'CONDUCTOR')
-      return import('../../trabajador/conductor/atenciones/listado/listado').then(m => m.MisAtencionesConductor);
-    if (vista === 'atenciones' && rol === 'PROGRAMADOR')
-      return import('../../trabajador/programador/atenciones/listado/listado').then(m => m.AtencionesProgramador);
-    return import('../listado/listado').then(m => m.Listado);
+      ? import('../inicio/inicio-programador').then(m => m.InicioProgramador)
+      : import('../inicio/resumen').then(m => m.Dashboard);
+    const pantalla = seccionDe(rol, vista)?.pantalla;
+    return pantalla ? pantalla() : import('../compartido/listado/listado').then(m => m.Listado);
   }
 }

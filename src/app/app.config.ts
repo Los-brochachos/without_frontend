@@ -10,7 +10,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     providePrimeNG({
       theme:{
-        preset: Aura      
+        preset: Aura,
+        // PrimeNG pasa a oscuro solo cuando el usuario lo elige en Preferencias (clase .app-oscuro en <html>),
+        // no por el modo oscuro del sistema operativo.
+        options: { darkModeSelector: '.app-oscuro' }
       },
       license: 'eyJpZCI6ImQ0NTJhZWFlLWVjODItNGVlYy1hYzhhLTMxNmFmYmU5NTAxZSIsInByb2R1Y3QiOiJwcmltZXVpIiwidGllciI6ImNvbW11bml0eSIsInR5cGUiOiJkZXYiLCJpYXQiOjE3OTExMzk4NTYsImV4cCI6MTgyMjY3NTg1Nn0.FlEGw_pZ1uEFbZq7TSflZTXQPnr__775rQgCdAecQk8GDacYTYbN6S0-qcvsbwZZ6F3_KPEENi0kiQG6m6_6AQ'
     }),

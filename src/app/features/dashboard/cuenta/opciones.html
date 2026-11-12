@@ -1,0 +1,57 @@
+<section class="mx-auto max-w-3xl space-y-6 text-slate-900">
+  <a [routerLink]="inicio()" class="text-sm text-sky-700">Volver al inicio</a>
+  @if (error()) { <p role="alert" class="rounded-lg bg-red-50 p-4 text-red-700">{{ error() }}</p> }
+  @if (mensaje()) { <p role="status" class="rounded-lg bg-green-50 p-4 text-green-800">{{ mensaje() }}</p> }
+  @switch (pagina()) {
+    @case ('seguridad') {
+      <h1 class="text-3xl font-semibold text-[#002d54]">Seguridad</h1><p class="text-slate-600">Cambia tu contraseña. Al guardar se cerrará esta sesión y deberás ingresar con la nueva clave.</p>
+      <form [formGroup]="clave" (ngSubmit)="cambiarClave()" novalidate class="space-y-5 rounded-xl border bg-white p-6"><fieldset [disabled]="guardando()" class="space-y-4"><div><label for="clave-actual" class="mb-2 block text-sm font-medium">Contraseña actual</label><input pInputText id="clave-actual" type="password" formControlName="actual" autocomplete="current-password" class="w-full" /></div><div><label for="clave-nueva" class="mb-2 block text-sm font-medium">Nueva contraseña</label><input pInputText id="clave-nueva" type="password" formControlName="nueva" autocomplete="new-password" maxlength="72" class="w-full" /></div><div><label for="clave-confirmacion" class="mb-2 block text-sm font-medium">Confirmar nueva contraseña</label><input pInputText id="clave-confirmacion" type="password" formControlName="confirmacion" autocomplete="new-password" maxlength="72" class="w-full" /></div>@if (clave.controls.confirmacion.touched && clave.hasError('distintas')) { <p class="text-sm text-red-700">Las contraseñas no coinciden.</p> }</fieldset><button pButton type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Cambiar contraseña' }}</button></form>
+    }
+    @case ('preferencias') {
+      <h1 class="text-3xl font-semibold text-[#002d54]">Preferencias</h1><p class="text-slate-600">Se guardan para tu cuenta en este navegador y se aplican en todo el portal.</p>
+      <form [formGroup]="ajustes" (ngSubmit)="guardarPreferencias()" class="space-y-6 rounded-xl border border-slate-200 bg-white p-6">
+
+        <!-- TEMA -->
+        <fieldset>
+          <legend class="mb-3 text-sm font-semibold text-slate-700">Tema de la aplicación</legend>
+          <div class="grid gap-3 sm:grid-cols-3">
+            @for (t of temas; track t.valor) {
+              <label [class]="'flex cursor-pointer flex-col gap-3 rounded-xl border-2 p-4 transition-colors ' + (ajustes.controls.tema.value === t.valor ? 'border-[#0077cc] bg-sky-50' : 'border-slate-200 hover:border-sky-200')">
+                <input type="radio" formControlName="tema" [value]="t.valor" class="sr-only" />
+                <span [class]="'flex h-14 items-end gap-1.5 rounded-lg p-2 ' + t.muestra" aria-hidden="true">
+                  <span class="h-full w-4 rounded bg-[#002d54]"></span>
+                  <span [class]="'h-6 flex-1 rounded ' + t.tarjeta"></span>
+                </span>
+                <span class="flex items-center gap-2 text-sm font-semibold text-slate-800"><i [class]="t.icono"></i>{{ t.etiqueta }}</span>
+                <span class="text-xs text-slate-500">{{ t.descripcion }}</span>
+              </label>
+            }
+          </div>
+        </fieldset>
+
+        <!-- FORMATO DE FECHA -->
+        <div>
+          <label for="formato-fecha" class="mb-2 block text-sm font-semibold text-slate-700">Formato de fechas</label>
+          <select id="formato-fecha" formControlName="formato" class="w-full rounded-lg border border-slate-300 bg-white p-3">
+            <option value="dd/MM/yyyy">Día / mes / año</option>
+            <option value="yyyy-MM-dd">Año - mes - día</option>
+          </select>
+          <p class="mt-2 text-xs text-slate-500">Vista previa: <strong class="text-slate-700">{{ hoy | date:(ajustes.controls.formato.value + ' HH:mm') }}</strong></p>
+        </div>
+
+        <!-- FILTRO DE CITAS (solo cliente) -->
+        @if (esCliente()) {
+          <div>
+            <label for="citas-predeterminadas" class="mb-2 block text-sm font-semibold text-slate-700">Filtro inicial de citas</label>
+            <select id="citas-predeterminadas" formControlName="citasEstado" class="w-full rounded-lg border border-slate-300 bg-white p-3"><option value="TODAS">Todas</option><option value="PROGRAMADA">Programadas</option><option value="EN_CURSO">En curso</option><option value="FINALIZADA">Finalizadas</option><option value="CANCELADA">Canceladas</option></select>
+          </div>
+        }
+
+        <button pButton type="submit">Guardar preferencias</button>
+      </form>
+    }
+    @case ('ayuda') {
+      <h1 class="text-3xl font-semibold text-[#002d54]">Centro de ayuda</h1><div class="space-y-4 rounded-xl border bg-white p-6"><details open><summary class="cursor-pointer font-semibold">¿Cómo registro un pedido?</summary><p class="mt-3 text-sm text-slate-600">En Pedidos → Crear pedido, selecciona fecha, prioridad, productos y cantidades. Al registrar recibirás un identificador y podrás consultar el detalle.</p><a routerLink="/cliente/pedidos/nuevo" class="mt-2 inline-block text-sm text-sky-700">Crear pedido</a></details><details><summary class="cursor-pointer font-semibold">¿Dónde consulto mi programación?</summary><p class="mt-3 text-sm text-slate-600">En Citas aparecen las atenciones asociadas a tus pedidos, con su horario y estado. Una atención FINALIZADA no sustituye al estado de entrega del pedido.</p><a routerLink="/cliente/citas" class="mt-2 inline-block text-sm text-sky-700">Consultar citas</a></details><details><summary class="cursor-pointer font-semibold">¿Puedo cancelar un pedido?</summary><p class="mt-3 text-sm text-slate-600">Abre el detalle en Mis pedidos. Si el pedido está RECIBIDO o EN_PREPARACION, puedes registrar un motivo y confirmar su cancelación. Una vez DESPACHADO ya no se puede cancelar.</p></details><details><summary class="cursor-pointer font-semibold">¿Cómo actualizo mis datos?</summary><p class="mt-3 text-sm text-slate-600">En Mi perfil selecciona Editar datos. Guarda los cambios para actualizar la razón social, RUC, teléfono o dirección de tu empresa.</p><a routerLink="/cliente/perfil" class="mt-2 inline-block text-sm text-sky-700">Mi perfil</a></details></div>
+    }
+  }
+</section>

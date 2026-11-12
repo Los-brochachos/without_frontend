@@ -1,0 +1,96 @@
+<section class="mx-auto flex w-full max-w-6xl min-w-0 flex-col gap-6 px-4 py-6 text-slate-800 sm:px-6">
+
+  <a routerLink="/dashboard/productos" class="inline-flex w-fit items-center gap-2 text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54]">
+    <i class="pi pi-arrow-left text-xs"></i>
+    Volver a Productos
+  </a>
+
+  <!-- ENCABEZADO -->
+  <div class="min-w-0">
+    <div class="mb-2 flex items-center gap-2">
+      <span class="h-1.5 w-1.5 rounded-full bg-[#0077cc]"></span>
+      <span class="text-xs font-bold uppercase tracking-widest text-[#0077cc]">Catálogo · Administración</span>
+    </div>
+    <h1 class="text-2xl font-bold tracking-tight text-[#002d54] sm:text-3xl">
+      {{ esEdicion() ? 'Editar producto #' + idEdicion() : 'Crear producto' }}
+    </h1>
+    <p class="mt-2 text-sm text-slate-500">
+      {{ esEdicion() ? 'Actualiza los datos o el precio. Los pedidos ya registrados conservan el precio con el que se guardaron.' : 'Registra un nuevo producto; quedará activo y disponible en el catálogo.' }}
+    </p>
+  </div>
+
+  @if (cargando()) {
+    <div role="status" class="flex min-h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <i class="pi pi-spin pi-spinner text-3xl text-[#0077cc]"></i>
+      <p class="text-sm font-semibold text-[#002d54]">Consultando producto…</p>
+    </div>
+  } @else if (errorCarga()) {
+    <div role="alert" class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <i class="pi pi-exclamation-triangle mt-0.5"></i>{{ errorCarga() }}
+    </div>
+  } @else {
+
+    @if (original()?.estado === 'INACTIVO') {
+      <p role="status" class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <i class="pi pi-info-circle mt-0.5"></i>
+        Este producto está inactivo: puedes editar sus datos, pero no aparece en el catálogo ni en nuevos pedidos.
+      </p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+
+      <!-- DATOS -->
+      <fieldset [disabled]="guardando()" class="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center gap-4 border-b border-slate-100 px-6 py-6 sm:px-8">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#eaf4fc] text-[#0077cc]"><i class="pi pi-box text-xl"></i></div>
+          <div>
+            <h2 class="text-lg font-bold text-[#002d54]">Datos del producto</h2>
+            <p class="mt-1 text-xs text-slate-500">Todos los campos son obligatorios.</p>
+          </div>
+        </div>
+
+        <div class="grid gap-6 p-6 sm:grid-cols-2 sm:p-8">
+          <div class="flex min-w-0 flex-col sm:col-span-2">
+            <label for="nombre" class="mb-2 text-sm font-semibold text-slate-700">Nombre <span class="text-red-500">*</span></label>
+            <input pInputText id="nombre" formControlName="nombre" maxlength="100" placeholder="Ej. Oxígeno medicinal" [attr.aria-invalid]="campoInvalido('nombre')" class="h-12! w-full! rounded-lg! border! border-slate-300! px-4! text-sm! shadow-none! focus:border-[#0077cc]!" />
+            @if (campoInvalido('nombre')) { <p class="mt-2 text-xs text-red-700">Ingresa un nombre de hasta 100 caracteres.</p> }
+          </div>
+          <div class="flex min-w-0 flex-col">
+            <label for="tipo-gas" class="mb-2 text-sm font-semibold text-slate-700">Tipo de gas <span class="text-red-500">*</span></label>
+            <input pInputText id="tipo-gas" formControlName="tipoGas" maxlength="50" placeholder="Ej. Oxígeno" [attr.aria-invalid]="campoInvalido('tipoGas')" class="h-12! w-full! rounded-lg! border! border-slate-300! px-4! text-sm! shadow-none! focus:border-[#0077cc]!" />
+            @if (campoInvalido('tipoGas')) { <p class="mt-2 text-xs text-red-700">Ingresa el tipo de gas (máx. 50).</p> }
+          </div>
+          <div class="flex min-w-0 flex-col">
+            <label for="unidad" class="mb-2 text-sm font-semibold text-slate-700">Unidad de medida <span class="text-red-500">*</span></label>
+            <input pInputText id="unidad" formControlName="unidadMedida" maxlength="30" placeholder="Ej. m3" [attr.aria-invalid]="campoInvalido('unidadMedida')" class="h-12! w-full! rounded-lg! border! border-slate-300! px-4! text-sm! shadow-none! focus:border-[#0077cc]!" />
+            @if (campoInvalido('unidadMedida')) { <p class="mt-2 text-xs text-red-700">Ingresa la unidad (máx. 30).</p> }
+          </div>
+          <div class="flex min-w-0 flex-col">
+            <label for="precio" class="mb-2 text-sm font-semibold text-slate-700">Precio unitario (S/) <span class="text-red-500">*</span></label>
+            <input pInputText id="precio" type="number" min="0.01" step="0.01" inputmode="decimal" formControlName="precioUnitario" [attr.aria-invalid]="campoInvalido('precioUnitario')" class="h-12! w-full! rounded-lg! border! border-slate-300! px-4! text-sm! shadow-none! focus:border-[#0077cc]!" />
+            @if (campoInvalido('precioUnitario')) { <p class="mt-2 text-xs text-red-700">Mayor a 0, con hasta dos decimales.</p> }
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- VISTA PREVIA + GUARDAR -->
+      <aside class="min-w-0 space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-6">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Vista previa en el catálogo</h2>
+        <div class="rounded-xl border border-sky-100 bg-[#f5f9fd] p-4">
+          <p class="text-[11px] font-bold uppercase tracking-widest text-[#0077cc]">Producto del catálogo</p>
+          <p class="mt-2 wrap-break-word text-lg font-bold text-[#002d54]">{{ vista().nombre || 'Nombre del producto' }}</p>
+          <p class="mt-2 text-xs text-slate-600">{{ vista().tipoGas || 'Tipo de gas' }} · {{ vista().unidadMedida || 'unidad' }}</p>
+          <p class="mt-3 text-2xl font-bold text-[#002d54]">{{ (vista().precioUnitario ?? 0) | number:'1.2-2' }}</p>
+        </div>
+
+        @if (error()) { <div role="alert" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{{ error() }}</div> }
+
+        <button type="submit" [disabled]="guardando()" class="flex w-full items-center justify-center gap-3 rounded-xl bg-[#0077cc] px-5 py-4 text-sm font-bold text-white transition-colors hover:bg-[#005491] disabled:opacity-50">
+          <i [class]="guardando() ? 'pi pi-spin pi-spinner' : 'pi pi-check-circle'"></i>
+          {{ guardando() ? 'Guardando…' : esEdicion() ? 'Guardar cambios' : 'Crear producto' }}
+        </button>
+        <a routerLink="/dashboard/productos" class="block text-center text-sm font-semibold text-slate-500 hover:text-[#002d54]">Cancelar</a>
+      </aside>
+    </form>
+  }
+</section>

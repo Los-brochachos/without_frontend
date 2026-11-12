@@ -7,21 +7,17 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 
-import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
+import { IsActiveMatchOptions, Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, combineLatest, filter, map, of, startWith, switchMap } from 'rxjs';
 import { InputTextModule } from 'primeng/inputtext';
 import { Auth } from '../../../core/auth/auth';
 import { ClienteService } from '../../../core/services/cliente/cliente-service';
 import { ApiService } from '../../../core/services/api.service';
-import { DASHBOARD_ROLES } from '../../../features/dashboard/dashboard-data';
+import { DASHBOARD_ROLES, ItemMenu, rutaSeccion } from '../../../features/dashboard/dashboard-data';
 
-const CLIENT_SECTIONS = [
-  { key: 'pedidos', title: 'Pedidos', route: '/cliente/pedidos' },
-  { key: 'citas', title: 'Citas', route: '/cliente/citas' },
-  { key: 'seguimiento', title: 'Seguimiento', route: '/cliente/seguimiento' },
-  { key: 'productos', title: 'Productos', route: '/cliente/productos' },
-];
+/** Entrada del menú ya resuelta para el rol actual (sale de dashboard-data.ts). */
+export interface SeccionMenu { key: string; title: string; route: string; icono: string; children: ItemMenu[]; matches: boolean }
 
 @Component({
   selector: 'app-sidebar',
@@ -101,41 +97,31 @@ const CLIENT_SECTIONS = [
 export class Sidebar {
 
   private readonly router = inject(Router);
-  readonly pedidosAbiertos = signal(false);
-  readonly atencionesAbiertas = signal(false);
-  readonly trabajadoresAbiertos = signal(false);
-  readonly trabajadoresActivos = computed(() => /^\/dashboard\/trabajadores(?:\/|$)/.test(this.rutaActual()));
-  readonly atencionesActivas = computed(() => /^\/dashboard\/atenciones(?:\/|$)/.test(this.rutaActual()));
-  abierto(key: string) { return !!this.search().trim() || (key === 'pedidos' ? this.pedidosAbiertos() : key === 'trabajadores' ? this.trabajadoresAbiertos() : this.atencionesAbiertas()); }
-  activo(key: string) { return key === 'pedidos' ? this.pedidosActivos() : key === 'trabajadores' ? this.trabajadoresActivos() : this.atencionesActivas(); }
-  toggleGrupo(key: string) { if (key === 'pedidos') this.togglePedidos(); else if (key === 'trabajadores') this.trabajadoresAbiertos.update(v => !v); else this.atencionesAbiertas.update(v => !v); }
+  /** Ruta exacta pero sin mirar ?query: así «Crear atención» sigue marcado en /atenciones/nueva?pedido=52. */
+  readonly activoExacto: IsActiveMatchOptions = { paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' };
+  readonly usuario = inject(Auth).usuario;
+  readonly search = signal('');
   readonly rutaActual = signal(this.router.url.split(/[?#]/)[0]);
-  readonly pedidosActivos = computed(() => /^\/(cliente|dashboard)\/pedidos(?:\/|$)/.test(this.rutaActual()));
-  readonly mostrarPedidos = computed(() => this.pedidosAbiertos() || !!this.search().trim());
+  /** Grupos desplegados por el usuario (por key de sección). */
+  private readonly abiertos = signal<ReadonlySet<string>>(new Set());
 
-  togglePedidos() { this.pedidosAbiertos.update(abierto => !abierto); }
-
-  constructor() {
-    if (this.trabajadoresActivos()) this.trabajadoresAbiertos.set(true);
-    if (this.atencionesActivas()) this.atencionesAbiertas.set(true);
-    if (this.pedidosActivos()) this.pedidosAbiertos.set(true);
-    this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd), takeUntilDestroyed())
-      .subscribe(event => {
-        this.rutaActual.set(event.urlAfterRedirects.split(/[?#]/)[0]);
-        if (this.trabajadoresActivos()) this.trabajadoresAbiertos.set(true);
-        if (this.atencionesActivas()) this.atencionesAbiertas.set(true);
-        if (this.pedidosActivos()) this.pedidosAbiertos.set(true);
-      });
+  /** Un grupo está activo si la ruta actual está dentro de su sección (p. ej. /dashboard/atenciones/nueva). */
+  activo(section: SeccionMenu) { return this.rutaActual() === section.route || this.rutaActual().startsWith(section.route + '/'); }
+  abierto(key: string) { return !!this.search().trim() || this.abiertos().has(key); }
+  toggleGrupo(key: string) {
+    this.abiertos.update(actual => { const s = new Set(actual); if (s.has(key)) s.delete(key); else s.add(key); return s; });
+  }
+  /** Al navegar, se despliega el grupo de la sección actual (sin cerrar los que abrió el usuario). */
+  private abrirActivo() {
+    const activa = this.sections().find(s => s.children.length && this.activo(s));
+    if (activa && !this.abiertos().has(activa.key)) this.abiertos.update(actual => new Set(actual).add(activa.key));
   }
 
-  readonly usuario = inject(Auth).usuario;
-
-  readonly iconosAdmin: Record<string, string> = {
-    usuarios: 'pi pi-id-card', clientes: 'pi pi-building', alertas: 'pi pi-bell',
-    fallas: 'pi pi-exclamation-triangle', productos: 'pi pi-box', cisternas: 'pi pi-truck',
-    conductores: 'pi pi-compass', historial: 'pi pi-history',
-  };
-  readonly search = signal('');
+  constructor() {
+    this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd), takeUntilDestroyed())
+      .subscribe(event => { this.rutaActual.set(event.urlAfterRedirects.split(/[?#]/)[0]); this.abrirActivo(); });
+    queueMicrotask(() => this.abrirActivo());
+  }
 
   readonly isClient = computed(() =>
     this.usuario()?.rol === 'CLIENTE'
@@ -174,31 +160,16 @@ export class Sidebar {
   );
 
 
-  readonly sections = computed(() => {
-
+  /** Menú del rol actual, tal como lo define dashboard-data.ts (un rol sin el módulo no lo ve). */
+  readonly sections = computed<SeccionMenu[]>(() => {
     const query = this.search().trim().toLocaleLowerCase();
-
-    const menu = this.isClient()
-      ? CLIENT_SECTIONS
-      : (DASHBOARD_ROLES[this.usuario()?.rol ?? '']?.sections ?? []).map(section => ({
-          key: section.key,
-          title: section.title,
-          route: `/dashboard/${section.key}`,
-        }));
-
-    return menu.map(section => {
-      const children = section.key === 'trabajadores' && this.usuario()?.rol === 'ADMIN' ? [
-        { title: 'Crear Trabajador', route: '/dashboard/trabajadores/nuevo', icon: 'pi pi-user-plus' },
-        { title: 'Listar Trabajadores', route: '/dashboard/trabajadores', icon: 'pi pi-list' },
-      ] : section.key === 'atenciones' ? [
-        { title: this.usuario()?.rol === 'CONDUCTOR' ? 'Mis atenciones' : 'Listar atenciones', route: '/dashboard/atenciones', icon: 'pi pi-list' },
-        ...(this.usuario()?.rol === 'PROGRAMADOR' ? [{ title: 'Crear atención', route: '/dashboard/atenciones/nueva', icon: 'pi pi-calendar-plus' }] : []),
-      ] : section.key !== 'pedidos' ? [] : this.isClient()
-        ? [{ title: 'Mis pedidos', route: '/cliente/pedidos', icon: 'pi pi-list' },
-           { title: 'Crear pedido', route: '/cliente/pedidos/nuevo', icon: 'pi pi-plus' }]
-        : [{ title: 'Listar pedidos', route: '/dashboard/pedidos', icon: 'pi pi-list' }];
-      const matches = section.title.toLocaleLowerCase().includes(query);
-      return { ...section, children: children.filter(child => matches || child.title.toLocaleLowerCase().includes(query)), matches };
+    const rol = this.usuario()?.rol;
+    return (DASHBOARD_ROLES[rol ?? '']?.sections ?? []).map(section => {
+      const matches = section.menu.toLocaleLowerCase().includes(query);
+      return {
+        key: section.key, title: section.menu, route: rutaSeccion(rol, section.key), icono: section.icono, matches,
+        children: section.hijos.filter(hijo => matches || hijo.titulo.toLocaleLowerCase().includes(query)),
+      };
     }).filter(section => section.matches || section.children.length > 0);
   });
 }

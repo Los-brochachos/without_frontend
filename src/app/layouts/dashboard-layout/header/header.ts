@@ -77,11 +77,10 @@ export class Header {
 
   readonly items = computed<MenuItem[]>(() => {
 
-    const base = this.usuario()?.rol === 'CLIENTE'
-      ? '/cliente'
-      : '/dashboard';
+    const esCliente = this.usuario()?.rol === 'CLIENTE';
+    const base = esCliente ? '/cliente' : '/dashboard';
 
-    return [
+    const items: MenuItem[] = [
       {
         label: 'Mi perfil',
         icon: 'pi pi-user',
@@ -97,11 +96,12 @@ export class Header {
         icon: 'pi pi-cog',
         routerLink: `${base}/preferencias`
       },
-      {
+      // El centro de ayuda solo tiene contenido para el cliente (por ahora).
+      ...(esCliente ? [{
         label: 'Centro de ayuda',
         icon: 'pi pi-question-circle',
         routerLink: `${base}/ayuda`
-      },
+      }] : []),
       {
         separator: true
       },
@@ -111,6 +111,7 @@ export class Header {
         command: () => this.cerrarSesion()
       }
     ];
+    return items;
   });
 
   cerrarSesion(): void {

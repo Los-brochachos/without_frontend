@@ -57,3 +57,144 @@ input:disabled {
   cursor: not-allowed;
   opacity: 0.65;
 }
+
+
+/* ==========================================================================
+   MODO OSCURO (Preferencias → Tema). Se activa con <html class="app-oscuro">.
+   Estrategia: Tailwind 4 define los colores como variables CSS, así que se
+   redefinen solo los tonos CLAROS (50–300, usados en fondos y bordes) y se
+   sobrescriben los colores de TEXTO clase por clase. Los tonos fuertes
+   (bg-red-700, bg-[#002d54]…) no se tocan: son botones con texto blanco.
+   Estos estilos no están en una @layer, por eso ganan a las utilidades.
+   ========================================================================== */
+.app-oscuro {
+  color-scheme: dark;
+  --oscuro-fondo: #0b1220;
+  --oscuro-tarjeta: #111a2b;
+  --oscuro-suave: #16223a;
+  --oscuro-borde: #26364f;
+  --oscuro-titulo: #e3edfb;
+  --oscuro-enlace: #6cb8f2;
+
+  /* Fondos y bordes claros → tonos oscuros */
+  --color-slate-50: #141f33;
+  --color-slate-100: #1b2840;
+  --color-slate-200: #26364f;
+  --color-slate-300: #34465f;
+  --color-sky-50: #102a45;
+  --color-sky-100: #15365a;
+  --color-emerald-50: #0f2e25;
+  --color-emerald-100: #134235;
+  --color-green-50: #0f2e25;
+  --color-amber-50: #33270e;
+  --color-amber-100: #45340f;
+  --color-red-50: #3a1518;
+  --color-red-100: #4c1a1e;
+}
+.app-oscuro body { background-color: var(--oscuro-fondo); color: #dde4ee; }
+
+/* Superficies */
+.app-oscuro .bg-white { background-color: var(--oscuro-tarjeta); }
+.app-oscuro .hover\:bg-white:hover { background-color: var(--oscuro-suave); }
+.app-oscuro .bg-\[\#f4f7fb\] { background-color: var(--oscuro-fondo); }
+.app-oscuro .bg-\[\#eaf4fc\],
+.app-oscuro .bg-\[\#f5f8fc\],
+.app-oscuro .bg-\[\#f8fafd\],
+.app-oscuro .bg-\[\#f5f9fd\] { background-color: var(--oscuro-suave); }
+.app-oscuro .via-white { --tw-gradient-via: var(--oscuro-tarjeta); }
+
+/* Textos */
+.app-oscuro .text-slate-900 { color: #eef2f7; }
+.app-oscuro .text-slate-800 { color: #dde4ee; }
+.app-oscuro .text-slate-700 { color: #c7d1de; }
+.app-oscuro .text-slate-600 { color: #b3bfcf; }
+.app-oscuro .text-slate-500 { color: #9aa8bc; }
+.app-oscuro .text-slate-400 { color: #8392a8; }
+.app-oscuro .text-\[\#002d54\],
+.app-oscuro .text-\[\#003b70\],
+.app-oscuro .hover\:text-\[\#002d54\]:hover { color: var(--oscuro-titulo); }
+.app-oscuro .text-\[\#0077cc\],
+.app-oscuro .text-\[\#007ac3\],
+.app-oscuro .text-\[\#005491\],
+.app-oscuro .text-\[\#005b9f\],
+.app-oscuro .text-\[\#0c4d85\],
+.app-oscuro .text-sky-700 { color: var(--oscuro-enlace); }
+.app-oscuro .text-sky-800 { color: #9fd3f7; }
+.app-oscuro .text-sky-900 { color: #c3e4fb; }
+.app-oscuro .text-emerald-600,
+.app-oscuro .text-emerald-700 { color: #6ee7b7; }
+.app-oscuro .text-emerald-800,
+.app-oscuro .text-emerald-900,
+.app-oscuro .text-green-800 { color: #a7f3d0; }
+.app-oscuro .text-amber-600,
+.app-oscuro .text-amber-700 { color: #fcd34d; }
+.app-oscuro .text-amber-800,
+.app-oscuro .text-amber-900 { color: #fde68a; }
+.app-oscuro .text-red-500,
+.app-oscuro .text-red-600,
+.app-oscuro .text-red-700 { color: #fca5a5; }
+.app-oscuro .text-red-800,
+.app-oscuro .text-red-900 { color: #fecaca; }
+
+/* Bordes de color claro */
+.app-oscuro .border-sky-100,
+.app-oscuro .border-sky-200 { border-color: #1f4a75; }
+.app-oscuro .border-emerald-100,
+.app-oscuro .border-emerald-200 { border-color: #1d5a47; }
+.app-oscuro .border-amber-200,
+.app-oscuro .border-amber-300 { border-color: #5c4512; }
+.app-oscuro .border-red-200 { border-color: #6b2328; }
+
+/* Formularios: anula el blanco forzado de arriba */
+.app-oscuro input.p-inputtext,
+.app-oscuro input.p-password-input,
+.app-oscuro .p-inputmask,
+.app-oscuro input[type="email"],
+.app-oscuro input[type="password"],
+.app-oscuro input[type="text"],
+.app-oscuro input[type="tel"],
+.app-oscuro input[type="number"],
+.app-oscuro input[type="search"],
+.app-oscuro input[type="date"],
+.app-oscuro input[type="datetime-local"],
+.app-oscuro select,
+.app-oscuro textarea {
+  background-color: var(--oscuro-suave) !important;
+  color: #eef2f7 !important;
+  border-color: var(--oscuro-borde) !important;
+}
+.app-oscuro input.p-inputtext:focus,
+.app-oscuro input.p-password-input:focus,
+.app-oscuro .p-inputmask:focus,
+.app-oscuro select:focus,
+.app-oscuro textarea:focus {
+  background-color: var(--oscuro-suave) !important;
+  color: #eef2f7 !important;
+  border-color: var(--oscuro-enlace) !important;
+}
+.app-oscuro input::placeholder,
+.app-oscuro textarea::placeholder { color: #6b7a90 !important; }
+.app-oscuro input:-webkit-autofill,
+.app-oscuro input:-webkit-autofill:hover,
+.app-oscuro input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #eef2f7 !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--oscuro-suave) inset !important;
+  box-shadow: 0 0 0 1000px var(--oscuro-suave) inset !important;
+}
+
+/* Campos con utilidades importantes (bg-white!, text-slate-900!…): un !important dentro de
+   la @layer de Tailwind gana a uno sin capa, así que se redefinen las VARIABLES que esas
+   utilidades leen, directamente en el campo. */
+.app-oscuro :is(input, select, textarea) {
+  --color-white: var(--oscuro-suave);
+  --color-slate-900: #eef2f7;
+  --color-slate-800: #eef2f7;
+  --color-slate-300: var(--oscuro-borde);
+  --color-slate-400: #6b7a90;
+}
+
+/* Degradados claros (p. ej. cabecera de las tarjetas del catálogo) */
+.app-oscuro .from-\[\#f5f9fd\],
+.app-oscuro .from-white { --tw-gradient-from: var(--oscuro-suave); }
+.app-oscuro .to-sky-50,
+.app-oscuro .to-white { --tw-gradient-to: var(--oscuro-tarjeta); }

@@ -2,9 +2,12 @@
   <!-- ENCABEZADO -->
   <section class="relative overflow-hidden bg-[#002d54] px-6 py-16 text-white sm:px-10 lg:py-24">
 
-    <div class="pointer-events-none absolute -right-24 -top-36 h-96 w-96 rounded-full border border-white/10"></div>
-    <div class="pointer-events-none absolute -right-5 -top-20 h-72 w-72 rounded-full border border-white/10"></div>
-    <div class="pointer-events-none absolute bottom-0 right-1/4 h-40 w-40 rounded-full bg-[#0077cc]/10 blur-3xl"></div>
+    <!-- Imagen decorativa: el filtro se aplica solo al fondo, manteniendo el texto nítido. -->
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+      <img src="/images/content/fnaf_without.png" alt="" fetchpriority="high" class="h-full w-full scale-100 object-cover object-[center_42%] opacity-100 blur-[2px] saturate-100" />
+      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,20,40,0.94)_0%,rgba(0,29,54,0.76)_45%,rgba(0,20,40,0.3)_100%)]"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,20,40,0.65)_0%,transparent_10%)]"></div>
+    </div>
 
     <div class="relative mx-auto max-w-7xl">
 
