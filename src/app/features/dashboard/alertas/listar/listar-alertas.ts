@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { AlertaService } from '../../../../core/services/atencion/alerta-service';
 import { Auth } from '../../../../core/auth/auth';
+import { tieneRol } from '../../../../core/auth/access';
 import { AlertaResponse, EstadoAlerta, TIPOS_ALERTA } from '../../../../core/models/AlertaModel';
 
 type Filtro = EstadoAlerta | 'TODAS';
@@ -23,7 +24,7 @@ export class AlertasOperacion {
   private readonly destroyRef = inject(DestroyRef);
   private readonly auth = inject(Auth);
   /** Solo el programador gestiona alertas; los demás roles las consultan. */
-  readonly puedeGestionar = computed(() => this.auth.usuario()?.rol === 'PROGRAMADOR');
+  readonly puedeGestionar = computed(() => tieneRol(this.auth.usuario()?.rol, 'PROGRAMADOR'));
   /** El conductor solo ve las alertas de SUS atenciones (GET /alertas/mis-alertas). */
   readonly esConductor = computed(() => this.auth.usuario()?.rol === 'CONDUCTOR');
 

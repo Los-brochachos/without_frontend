@@ -1,0 +1,100 @@
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 text-slate-800 sm:px-6 lg:py-9">
+
+  <a routerLink="/dashboard/clientes" class="inline-flex w-fit items-center gap-2 text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54]">
+    <i class="pi pi-arrow-left text-xs"></i> Volver a Clientes
+  </a>
+
+  <!-- ENCABEZADO -->
+  <div>
+    <div class="mb-2 flex items-center gap-2">
+      <span class="h-1.5 w-1.5 rounded-full bg-[#0077cc]"></span>
+      <span class="text-xs font-bold uppercase tracking-widest text-[#0077cc]">Clientes · Administración</span>
+    </div>
+    <h1 class="text-2xl font-bold tracking-tight text-[#002d54] sm:text-3xl">Editar cliente{{ registro() ? ' #' + registro()!.idCliente : '' }}</h1>
+    <p class="mt-2 text-sm text-slate-500">Corrige los datos de la empresa, o da de baja / reactiva su cuenta.</p>
+  </div>
+
+  <!-- SELECTOR (con búsqueda) -->
+  <app-selector-edicion [control]="seleccion" [opciones]="opciones()" [cargando]="cargandoRegistro()" inputId="selector-cliente"
+    etiqueta="¿Qué cliente quieres editar?" placeholder="Selecciona un cliente" ayudaFiltro="Razón social o RUC" vacio="No hay clientes registrados" />
+
+  @if (errorCarga()) {
+    <p role="alert" class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><i class="pi pi-exclamation-triangle mt-0.5"></i>{{ errorCarga() }}</p>
+  }
+  @if (mensaje()) {
+    <p role="status" class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"><i class="pi pi-check-circle mt-0.5"></i>{{ mensaje() }}</p>
+  }
+
+  @if (cargandoRegistro() && !registro()) {
+    <div role="status" class="flex min-h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <i class="pi pi-spin pi-spinner text-3xl text-[#0077cc]"></i><p class="text-sm font-semibold text-[#002d54]">Consultando cliente…</p>
+    </div>
+  } @else if (registro(); as c) {
+
+    @if (c.estado === 'INACTIVO') {
+      <p role="status" class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <i class="pi pi-info-circle mt-0.5"></i>Este cliente está dado de baja: no puede iniciar sesión ni registrar pedidos. Sus datos se conservan.
+      </p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-6 py-5 sm:px-8">
+        <div class="flex items-center gap-4">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eaf4fc] text-[#0077cc]"><i class="pi pi-building text-xl"></i></div>
+          <div class="min-w-0">
+            <h2 class="text-lg font-bold text-[#002d54]">Datos de la empresa</h2>
+            <p class="mt-1 break-all text-sm text-slate-500"><i class="pi pi-envelope mr-1 text-xs"></i>{{ c.correo }}</p>
+          </div>
+        </div>
+        <span class="shrink-0 rounded-full px-3 py-1 text-xs font-bold" [class]="c.estado === 'INACTIVO' ? 'bg-slate-100 text-slate-600' : 'bg-emerald-50 text-emerald-700'">{{ c.estado === 'INACTIVO' ? 'DE BAJA' : 'ACTIVO' }}</span>
+      </div>
+
+      <fieldset [disabled]="guardando()" class="grid gap-6 px-6 py-6 sm:grid-cols-2 sm:px-8">
+        <div class="flex flex-col gap-2">
+          <label for="cliente-ruc" class="text-sm font-semibold text-slate-700">RUC *</label>
+          <input pInputText id="cliente-ruc" formControlName="ruc" maxlength="11" inputmode="numeric" autocomplete="off" [attr.aria-invalid]="invalido('ruc')" class="h-12! w-full! rounded-xl!" />
+          @if (invalido('ruc')) { <p class="text-xs text-red-700">El RUC debe tener exactamente 11 dígitos.</p> }
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="cliente-telefono" class="text-sm font-semibold text-slate-700">Teléfono</label>
+          <input pInputText id="cliente-telefono" type="tel" formControlName="telefono" maxlength="9" inputmode="numeric" placeholder="987654321" [attr.aria-invalid]="invalido('telefono')" class="h-12! w-full! rounded-xl!" />
+          @if (invalido('telefono')) { <p class="text-xs text-red-700">Fijo de 8 dígitos o celular de 9 que empiece con 9.</p> }
+        </div>
+        <div class="flex flex-col gap-2 sm:col-span-2">
+          <label for="cliente-razon" class="text-sm font-semibold text-slate-700">Razón social *</label>
+          <input pInputText id="cliente-razon" formControlName="razonSocial" maxlength="100" [attr.aria-invalid]="invalido('razonSocial')" class="h-12! w-full! rounded-xl!" />
+          @if (invalido('razonSocial')) { <p class="text-xs text-red-700">Ingresa la razón social (máx. 100 caracteres).</p> }
+        </div>
+        <div class="flex flex-col gap-2 sm:col-span-2">
+          <label for="cliente-direccion" class="text-sm font-semibold text-slate-700">Dirección</label>
+          <input pInputText id="cliente-direccion" formControlName="direccion" maxlength="150" [attr.aria-invalid]="invalido('direccion')" class="h-12! w-full! rounded-xl!" />
+          @if (invalido('direccion')) { <p class="text-xs text-red-700">Máximo 150 caracteres.</p> }
+        </div>
+        <p class="flex items-start gap-2 text-xs text-slate-500 sm:col-span-2"><i class="pi pi-lock mt-0.5"></i>El correo de acceso no se edita aquí: lo cambia el propio cliente en Seguridad o el superadministrador en Usuarios.</p>
+      </fieldset>
+
+      @if (error()) {
+        <p role="alert" class="mx-6 mb-2 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-8"><i class="pi pi-exclamation-circle mt-0.5"></i>{{ error() }}</p>
+      }
+
+      <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        @if (c.estado === 'INACTIVO') {
+          <button type="button" (click)="cambiarEstado()" [disabled]="guardando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-emerald-300 px-5 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50"><i class="pi pi-replay"></i> Reactivar cliente</button>
+        } @else {
+          <button type="button" (click)="cambiarEstado()" [disabled]="guardando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-red-200 px-5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50 disabled:opacity-50"><i class="pi pi-ban"></i> Dar de baja</button>
+        }
+        <div class="flex flex-col-reverse gap-3 sm:flex-row">
+          <button type="button" (click)="recargar()" [disabled]="guardando() || form.pristine" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50">Descartar cambios</button>
+          <button type="submit" [disabled]="guardando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#007ac3] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#0064a3] disabled:cursor-not-allowed disabled:opacity-60">
+            <i class="pi" [class.pi-spin]="guardando()" [class.pi-spinner]="guardando()" [class.pi-save]="!guardando()"></i>{{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  } @else if (!cargando() && !errorCarga()) {
+    <div class="flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
+      <i class="pi pi-building mb-3 text-3xl text-slate-300"></i>
+      <p class="text-sm font-semibold text-[#002d54]">Elige un cliente en el selector para editarlo.</p>
+    </div>
+  }
+</section>

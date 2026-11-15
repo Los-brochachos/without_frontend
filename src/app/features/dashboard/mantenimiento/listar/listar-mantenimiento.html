@@ -1,0 +1,373 @@
+
+<section class="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-5 px-4 py-5 text-slate-800 sm:px-6">
+
+  <!-- VOLVER -->
+  <div>
+    <a [routerLink]="volver" class="inline-flex items-center gap-2 text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#005491] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0077cc]">
+      <i class="pi pi-arrow-left text-xs" aria-hidden="true"></i>
+      Volver al inicio
+    </a>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="flex min-w-0 flex-col justify-between gap-4 sm:flex-row sm:items-center">
+
+    <div class="min-w-0">
+
+      <div class="mb-2 flex items-center gap-2">
+        <span class="h-1.5 w-1.5 rounded-full bg-[#0077cc]" aria-hidden="true"></span>
+        <span class="text-xs font-semibold uppercase tracking-wider text-[#0077cc]">Mantenimiento</span>
+      </div>
+
+      <h1 class="text-2xl font-bold tracking-tight text-[#002d54] sm:text-3xl">
+        Historial de mantenimiento
+      </h1>
+
+      <p class="mt-2 text-sm leading-relaxed text-slate-500">
+        Consulta los trabajos realizados en las cisternas, sus resultados y costos.
+      </p>
+
+    </div>
+
+    <div class="flex shrink-0 flex-col gap-2 sm:flex-row">
+      <!-- Solo el técnico registra mantenimientos (POST /historial) -->
+      @if (puedeRegistrar) {
+        <a routerLink="/dashboard/historial/nuevo" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#007ac3] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#0064a3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0077cc]">
+          <i class="pi pi-plus text-sm" aria-hidden="true"></i> Registrar mantenimiento
+        </a>
+      }
+      <button type="button" (click)="actualizar()" [disabled]="cargando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-[#002d54] shadow-sm transition-colors hover:border-sky-300 hover:bg-sky-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0077cc] disabled:cursor-not-allowed disabled:opacity-50">
+        <i class="pi pi-refresh text-sm" [class.pi-spin]="cargando()" aria-hidden="true"></i>
+        {{ cargando() ? 'Actualizando...' : 'Actualizar listado' }}
+      </button>
+    </div>
+
+  </div>
+
+  @if (aviso()) {
+    <p role="status" class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+      <i class="pi pi-check-circle mt-0.5" aria-hidden="true"></i><span class="flex-1">{{ aviso() }}</span>
+      <button type="button" (click)="aviso.set('')" aria-label="Cerrar aviso" class="text-emerald-700 hover:text-emerald-900"><i class="pi pi-times text-xs"></i></button>
+    </p>
+  }
+
+  <!-- RESUMEN DE MANTENIMIENTO -->
+  @if (!cargando() && !error()) {
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+      <!-- TOTAL DE REGISTROS -->
+      <div class="flex min-w-0 items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#002d54]/5 text-[#002d54]">
+          <i class="pi pi-list text-xl" aria-hidden="true"></i>
+        </div>
+
+        <div class="min-w-0">
+          <p class="text-xs font-medium text-slate-500">Registros de mantenimiento</p>
+          <p class="mt-1 text-2xl font-bold tabular-nums text-[#002d54]">{{ total() }}</p>
+        </div>
+
+      </div>
+
+      <!-- COSTO TOTAL -->
+      <div class="flex min-w-0 items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#002d54]/5 text-[#002d54]">
+          <i class="pi pi-wallet text-xl" aria-hidden="true"></i>
+        </div>
+
+        <div class="min-w-0">
+          <p class="text-xs font-medium text-slate-500">Costo de los registros filtrados</p>
+          <p class="mt-1 wrap-break-word text-2xl font-bold tabular-nums text-[#002d54]">
+            {{ costoTotal() | currency:'PEN':'S/ ' }}
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <article class="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" [attr.aria-busy]="cargando()">
+
+    <!-- ENCABEZADO DEL LISTADO -->
+    <div class="px-4 py-5 sm:px-6">
+
+      <div class="flex items-center gap-3">
+
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#002d54]/5 text-[#002d54]">
+          <i class="pi pi-history text-lg" aria-hidden="true"></i>
+        </div>
+
+        <div class="min-w-0">
+          <h2 class="text-base font-bold text-[#002d54]">Registros de mantenimiento</h2>
+          <p class="mt-1 text-xs text-slate-500">Detalle de los trabajos ejecutados en las cisternas.</p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- BÚSQUEDA -->
+    <div class="border-b border-slate-200 px-4 pb-5 sm:px-6">
+
+      <div class="min-w-0">
+
+        <label for="buscar-mantenimiento" class="mb-1.5 block text-sm font-medium text-slate-700">
+          Buscar
+        </label>
+
+        <div class="relative">
+
+          <i class="pi pi-search pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true"></i>
+
+          <input pInputText id="buscar-mantenimiento" type="search" [value]="consulta()" (input)="buscar($any($event.target).value)" placeholder="N.º de registro o cisterna, descripción o resultado" class="h-11! w-full! min-w-0! rounded-lg! border! border-slate-300! bg-white! pl-11! pr-4! text-sm! text-slate-900! shadow-none! placeholder:text-slate-500! focus:border-[#0077cc]! focus:ring-2! focus:ring-sky-100!" />
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ESTADO DE CARGA -->
+    @if (cargando()) {
+
+      <div role="status" class="flex min-h-64 flex-col items-center justify-center gap-3 px-6 py-12 text-center">
+
+        <div class="flex h-14 w-14 items-center justify-center rounded-full bg-[#002d54]/5">
+          <i class="pi pi-spin pi-spinner text-2xl text-[#0077cc]" aria-hidden="true"></i>
+        </div>
+
+        <h3 class="text-sm font-semibold text-[#002d54]">Cargando historial</h3>
+
+        <p class="text-xs text-slate-500">Consultando los registros de mantenimiento...</p>
+
+      </div>
+
+    }
+
+    <!-- ERROR DE CARGA -->
+    @else if (error()) {
+
+      <div role="alert" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+
+        <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-red-50 text-red-600">
+          <i class="pi pi-exclamation-triangle text-xl" aria-hidden="true"></i>
+        </div>
+
+        <h3 class="text-base font-semibold text-slate-800">No se pudo cargar el historial</h3>
+
+        <p class="mt-2 max-w-md wrap-break-word text-sm leading-relaxed text-red-700">
+          {{ error() }}
+        </p>
+
+        <button type="button" (click)="actualizar()" class="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#002d54] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#004477] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#002d54]">
+          <i class="pi pi-refresh text-sm" aria-hidden="true"></i>
+          Reintentar
+        </button>
+
+      </div>
+
+    }
+
+    <!-- SIN REGISTROS -->
+    @else if (!filas().length) {
+
+      <div role="status" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+
+        <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+          <i class="pi pi-inbox text-2xl" aria-hidden="true"></i>
+        </div>
+
+        <h3 class="text-base font-semibold text-[#002d54]">
+          {{ consulta().trim() ? 'No se encontraron coincidencias' : 'Sin registros de mantenimiento' }}
+        </h3>
+
+        <p class="mt-2 max-w-sm wrap-break-word text-sm leading-relaxed text-slate-500">
+          {{ consulta().trim() ? 'Ningún registro coincide con «' + consulta() + '».' : 'Todavía no hay trabajos de mantenimiento registrados.' }}
+        </p>
+
+        @if (consulta().trim()) {
+
+          <button type="button" (click)="buscar('')" class="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-[#0077cc]">
+            <i class="pi pi-times text-xs" aria-hidden="true"></i>
+            Limpiar búsqueda
+          </button>
+
+        }
+
+      </div>
+
+    }
+
+    <!-- SIN COINCIDENCIAS -->
+    @else if (!visibles().length) {
+
+      <div role="status" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+
+        <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+          <i class="pi pi-search text-xl" aria-hidden="true"></i>
+        </div>
+
+        <h3 class="text-base font-semibold text-[#002d54]">No se encontraron coincidencias</h3>
+
+        <p class="mt-2 max-w-sm wrap-break-word text-sm leading-relaxed text-slate-500">
+          Ningún registro coincide con «{{ consulta() }}».
+        </p>
+
+        <button type="button" (click)="buscar('')" class="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-[#0077cc]">
+          <i class="pi pi-times text-xs" aria-hidden="true"></i>
+          Limpiar búsqueda
+        </button>
+
+      </div>
+
+    }
+
+    <!-- TABLA DE MANTENIMIENTO -->
+    @else {
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full min-w-[900px] text-left text-sm">
+
+          <caption class="sr-only">Historial de mantenimiento de las cisternas</caption>
+
+          <!-- CABECERA -->
+          <thead class="border-b border-slate-200 bg-[#f4f7fb] text-xs font-semibold text-slate-600">
+
+            <tr>
+              <th scope="col" class="whitespace-nowrap px-4 py-3.5 sm:pl-6">Registro</th>
+              <th scope="col" class="whitespace-nowrap px-4 py-3.5">Fecha</th>
+              <th scope="col" class="whitespace-nowrap px-4 py-3.5">Cisterna / falla</th>
+              <th scope="col" class="px-4 py-3.5">Trabajo realizado</th>
+              <th scope="col" class="px-4 py-3.5">Resultado</th>
+              <th scope="col" class="whitespace-nowrap px-4 py-3.5 text-right sm:pr-6">Costo</th>
+            </tr>
+
+          </thead>
+
+          <!-- REGISTROS -->
+          <tbody class="divide-y divide-slate-100">
+
+            @for (h of visibles(); track h.idHistorial) {
+
+              <tr class="align-top transition-colors hover:bg-slate-50">
+
+                <!-- NÚMERO DE REGISTRO -->
+                <td class="whitespace-nowrap px-4 py-4 sm:pl-6">
+
+                  <div class="flex items-center gap-2.5">
+
+                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#002d54]/5 text-[#002d54]">
+                      <i class="pi pi-file text-xs" aria-hidden="true"></i>
+                    </div>
+
+                    <span class="font-semibold tabular-nums text-[#002d54]">
+                      #{{ h.idHistorial }}
+                    </span>
+
+                  </div>
+
+                </td>
+
+                <!-- FECHA -->
+                <td class="whitespace-nowrap px-4 py-4 tabular-nums text-slate-600">
+                  {{ (h.fecha | fecha) ?? '—' }}
+                </td>
+
+                <!-- CISTERNA Y FALLA -->
+                <td class="whitespace-nowrap px-4 py-4">
+
+                  <div class="flex flex-col items-start gap-1.5">
+
+                    <span class="font-semibold text-slate-700">
+                      Cisterna #{{ h.idCisterna }}
+                    </span>
+
+                    @if (h.idFalla) {
+
+                      <span class="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
+                        <i class="pi pi-exclamation-circle text-[10px]" aria-hidden="true"></i>
+                        Falla #{{ h.idFalla }}
+                      </span>
+
+                    } @else {
+
+                      <span class="inline-flex items-center gap-1.5 rounded-md bg-sky-50 px-2 py-1 text-xs font-medium text-[#005491]">
+                        <i class="pi pi-shield text-[10px]" aria-hidden="true"></i>
+                        Preventivo
+                      </span>
+
+                    }
+
+                  </div>
+
+                </td>
+
+                <!-- TRABAJO REALIZADO -->
+                <td class="min-w-48 max-w-sm px-4 py-4">
+
+                  <span class="block wrap-break-word font-medium leading-relaxed text-slate-700">
+                    {{ h.descripcion || '—' }}
+                  </span>
+
+                  @if (h.observaciones) {
+
+                    <div class="mt-2 flex items-start gap-1.5 text-xs leading-relaxed text-slate-500">
+
+                      <i class="pi pi-comment mt-0.5 shrink-0 text-[11px]" aria-hidden="true"></i>
+
+                      <span class="min-w-0 wrap-break-word">
+                        {{ h.observaciones }}
+                      </span>
+
+                    </div>
+
+                  }
+
+                </td>
+
+                <!-- RESULTADO -->
+                <td class="max-w-xs px-4 py-4">
+
+                  <span class="block wrap-break-word leading-relaxed text-slate-700">
+                    {{ h.resultado || '—' }}
+                  </span>
+
+                </td>
+
+                <!-- COSTO -->
+                <td class="whitespace-nowrap px-4 py-4 text-right font-semibold tabular-nums text-[#002d54] sm:pr-6">
+                  {{ h.costo | currency:'PEN':'S/ ' }}
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    }
+
+    <!-- PAGINACIÓN -->
+    @if (!cargando() && !error() && filas().length) {
+
+      <div class="border-t border-slate-200 bg-slate-50">
+
+        <app-paginacion [pagina]="pagina()" [paginas]="paginas()" [total]="total()" (cambiar)="cambiarPagina($event)" />
+
+      </div>
+
+    }
+
+  </article>
+
+</section>

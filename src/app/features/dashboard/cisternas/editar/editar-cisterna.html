@@ -1,0 +1,94 @@
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 text-slate-800 sm:px-6 lg:py-9">
+
+  <a routerLink="/dashboard/cisternas" class="inline-flex w-fit items-center gap-2 text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54]">
+    <i class="pi pi-arrow-left text-xs"></i> Volver a Cisternas
+  </a>
+
+  <!-- ENCABEZADO -->
+  <div>
+    <div class="mb-2 flex items-center gap-2">
+      <span class="h-1.5 w-1.5 rounded-full bg-[#0077cc]"></span>
+      <span class="text-xs font-bold uppercase tracking-widest text-[#0077cc]">Flota · Administración</span>
+    </div>
+    <h1 class="text-2xl font-bold tracking-tight text-[#002d54] sm:text-3xl">Editar cisterna{{ registro() ? ' #' + registro()!.idCisterna : '' }}</h1>
+    <p class="mt-2 text-sm text-slate-500">Elige la cisterna, corrige su placa, nombre o capacidad, o dala de baja si ya no opera.</p>
+  </div>
+
+  <!-- SELECTOR (con búsqueda) -->
+  <app-selector-edicion [control]="seleccion" [opciones]="opciones()" [cargando]="cargandoRegistro()" inputId="selector-cisterna"
+    etiqueta="¿Qué cisterna quieres editar?" placeholder="Selecciona una cisterna" ayudaFiltro="Número, placa o nombre" vacio="No hay cisternas registradas" />
+
+  @if (errorCarga()) {
+    <p role="alert" class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><i class="pi pi-exclamation-triangle mt-0.5"></i>{{ errorCarga() }}</p>
+  }
+  @if (mensaje()) {
+    <p role="status" class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"><i class="pi pi-check-circle mt-0.5"></i>{{ mensaje() }}</p>
+  }
+
+  @if (cargandoRegistro() && !registro()) {
+    <div role="status" class="flex min-h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <i class="pi pi-spin pi-spinner text-3xl text-[#0077cc]"></i><p class="text-sm font-semibold text-[#002d54]">Consultando cisterna…</p>
+    </div>
+  } @else if (registro(); as c) {
+
+    @if (c.estado === 'INACTIVO') {
+      <p role="status" class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <i class="pi pi-info-circle mt-0.5"></i>Esta cisterna está dada de baja (INACTIVA): puedes corregir sus datos, pero no se usa en nuevas atenciones.
+      </p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-6 py-5 sm:px-8">
+        <div class="flex items-center gap-4">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eaf4fc] text-[#0077cc]"><i class="pi pi-pencil text-xl"></i></div>
+          <div>
+            <h2 class="text-lg font-bold text-[#002d54]">Datos de la cisterna</h2>
+            <p class="mt-1 text-sm text-slate-500">La placa y el nombre no pueden repetirse con otra cisterna.</p>
+          </div>
+        </div>
+        <span class="shrink-0 rounded-full px-3 py-1 text-xs font-bold" [class]="c.estado === 'ACTIVO' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'">{{ c.estado }}</span>
+      </div>
+
+      <fieldset [disabled]="guardando()" class="grid gap-6 px-6 py-6 sm:grid-cols-2 sm:px-8">
+        <div class="flex flex-col gap-2">
+          <label for="editar-placa" class="text-sm font-semibold text-slate-700">Placa *</label>
+          <input pInputText id="editar-placa" formControlName="placa" maxlength="20" autocomplete="off" [attr.aria-invalid]="invalido('placa')" class="h-12! w-full! rounded-xl! uppercase" />
+          @if (invalido('placa')) { <p class="text-xs text-red-700">Ingresa la placa (máx. 20 caracteres).</p> }
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="editar-capacidad" class="text-sm font-semibold text-slate-700">Capacidad *</label>
+          <input pInputText id="editar-capacidad" type="number" min="0.01" max="99999.99" step="0.01" formControlName="capacidad" [attr.aria-invalid]="invalido('capacidad')" class="h-12! w-full! rounded-xl!" />
+          @if (invalido('capacidad')) { <p class="text-xs text-red-700">Mayor a 0, hasta 99 999.99 y con 2 decimales como máximo.</p> }
+        </div>
+        <div class="flex flex-col gap-2 sm:col-span-2">
+          <label for="editar-nombre" class="text-sm font-semibold text-slate-700">Nombre *</label>
+          <input pInputText id="editar-nombre" formControlName="nombre" maxlength="100" autocomplete="off" [attr.aria-invalid]="invalido('nombre')" class="h-12! w-full! rounded-xl!" />
+          @if (invalido('nombre')) { <p class="text-xs text-red-700">Ingresa el nombre (máx. 100 caracteres).</p> }
+        </div>
+      </fieldset>
+
+      @if (error()) {
+        <p role="alert" class="mx-6 mb-2 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-8"><i class="pi pi-exclamation-circle mt-0.5"></i>{{ error() }}</p>
+      }
+
+      <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        @if (c.estado === 'ACTIVO') {
+          <button type="button" (click)="darDeBaja()" [disabled]="guardando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-red-200 px-5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50 disabled:opacity-50">
+            <i class="pi pi-ban"></i> Dar de baja
+          </button>
+        } @else { <span></span> }
+        <div class="flex flex-col-reverse gap-3 sm:flex-row">
+          <button type="button" (click)="recargar()" [disabled]="guardando() || form.pristine" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50">Descartar cambios</button>
+          <button type="submit" [disabled]="guardando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#007ac3] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#0064a3] disabled:cursor-not-allowed disabled:opacity-60">
+            <i class="pi" [class.pi-spin]="guardando()" [class.pi-spinner]="guardando()" [class.pi-save]="!guardando()"></i>{{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  } @else if (!cargando() && !errorCarga()) {
+    <div class="flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
+      <i class="pi pi-truck mb-3 text-3xl text-slate-300"></i>
+      <p class="text-sm font-semibold text-[#002d54]">Elige una cisterna en el selector para editarla.</p>
+    </div>
+  }
+</section>

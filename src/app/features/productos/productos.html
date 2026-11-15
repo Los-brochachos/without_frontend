@@ -4,7 +4,7 @@
   <!-- HERO -->
   <section class="relative flex min-h-90 items-center overflow-hidden bg-[#002d54] sm:min-h-107.5 lg:min-h-117.5">
 
-    <img src="https://images.pexels.com/photos/6060191/pexels-photo-6060191.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Gases, equipos y soluciones industriales without" class="absolute inset-0 h-full w-full object-cover object-center" />
+    <img src="https://images.pexels.com/photos/6060191/pexels-photo-6060191.jpeg?auto=compress&cs=tinysrgb&w=1400" [attr.alt]="'Gases, equipos y soluciones industriales without' | t" class="absolute inset-0 h-full w-full object-cover object-center" />
 
     <div class="absolute inset-0 bg-linear-to-r from-[#001c38]/95 via-[#002d54]/70 to-[#002d54]/20"></div>
 
@@ -13,21 +13,21 @@
       <div class="max-w-3xl">
 
         <div class="mb-7 flex items-center gap-2 text-sm text-white/80">
-          <a routerLink="/inicio" class="transition-colors hover:text-white">Inicio</a>
+          <a routerLink="/inicio" class="transition-colors hover:text-white">{{ 'Inicio' | t }}</a>
           <i class="pi pi-angle-right text-xs"></i>
-          <span class="font-semibold text-white">Productos</span>
+          <span class="font-semibold text-white">{{ 'Productos' | t }}</span>
         </div>
 
         <p class="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-sky-300">
-          Gases, modos de abastecimiento y productos
+          {{ 'Gases, modos de abastecimiento y productos' | t }}
         </p>
 
         <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Nuestros productos
+          {{ 'Nuestros productos' | t }}
         </h1>
 
         <p class="mt-6 max-w-2xl text-base leading-8 text-blue-50/90 sm:text-lg">
-          Gases industriales, medicinales y especiales, equipos y soluciones de suministro para diferentes necesidades.
+          {{ 'Gases industriales, medicinales y especiales, equipos y soluciones de suministro para diferentes necesidades.' | t }}
         </p>
 
       </div>
@@ -47,23 +47,23 @@
       <div>
 
         <p class="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#0077cc]">
-          ¿Qué ofrecemos?
+          {{ '¿Qué ofrecemos?' | t }}
         </p>
 
         <h2 class="text-3xl font-bold leading-tight tracking-tight text-[#002d54] sm:text-4xl">
-          Soluciones que hacen su trabajo más fácil, eficiente y seguro
+          {{ 'Soluciones que hacen su trabajo más fácil, eficiente y seguro' | t }}
         </h2>
 
         <p class="mt-6 text-base leading-8 text-slate-600">
-          Los gases industriales desempeñan un papel esencial en numerosas actividades cotidianas. Aunque muchas veces no son visibles, forman parte de procesos que permiten fabricar productos, conservar alimentos y desarrollar tecnologías.
+          {{ 'Los gases industriales desempeñan un papel esencial en numerosas actividades cotidianas. Aunque muchas veces no son visibles, forman parte de procesos que permiten fabricar productos, conservar alimentos y desarrollar tecnologías.' | t }}
         </p>
 
         <p class="mt-5 text-base leading-8 text-slate-600">
-          En without ofrecemos gases puros, mezclas especializadas, equipos y distintas modalidades de suministro para responder a las necesidades de nuestros clientes.
+          {{ 'En without ofrecemos gases puros, mezclas especializadas, equipos y distintas modalidades de suministro para responder a las necesidades de nuestros clientes.' | t }}
         </p>
 
         <p class="mt-5 text-base leading-8 text-slate-600">
-          Nuestro objetivo es contribuir a mejorar la productividad, optimizar procesos y ofrecer soluciones adaptadas a cada aplicación.
+          {{ 'Nuestro objetivo es contribuir a mejorar la productividad, optimizar procesos y ofrecer soluciones adaptadas a cada aplicación.' | t }}
         </p>
 
       </div>
@@ -73,15 +73,15 @@
         <div class="grid grid-cols-2 gap-3">
 
           <div class="row-span-2 overflow-hidden rounded-2xl bg-slate-100">
-            <img src="https://images.pexels.com/photos/16271901/pexels-photo-16271901.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Cilindros industriales without" loading="lazy" class="h-full min-h-82.5 w-full object-cover" />
+            <img src="https://images.pexels.com/photos/16271901/pexels-photo-16271901.jpeg?auto=compress&cs=tinysrgb&w=1400" [attr.alt]="'Cilindros industriales without' | t" loading="lazy" class="h-full min-h-82.5 w-full object-cover" />
           </div>
 
           <div class="overflow-hidden rounded-2xl bg-slate-100">
-            <img src="https://images.pexels.com/photos/2995864/pexels-photo-2995864.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Personal y soluciones de suministro" loading="lazy" class="h-40 w-full object-cover sm:h-47.5" />
+            <img src="https://images.pexels.com/photos/2995864/pexels-photo-2995864.jpeg?auto=compress&cs=tinysrgb&w=1400" [attr.alt]="'Personal y soluciones de suministro' | t" loading="lazy" class="h-40 w-full object-cover sm:h-47.5" />
           </div>
 
           <div class="overflow-hidden rounded-2xl bg-slate-100">
-            <img src="https://images.pexels.com/photos/7739856/pexels-photo-7739856.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Aplicaciones industriales" loading="lazy" class="h-40 w-full object-cover sm:h-47.5" />
+            <img src="https://images.pexels.com/photos/7739856/pexels-photo-7739856.jpeg?auto=compress&cs=tinysrgb&w=1400" [attr.alt]="'Aplicaciones industriales' | t" loading="lazy" class="h-40 w-full object-cover sm:h-47.5" />
           </div>
 
         </div>
@@ -101,15 +101,15 @@
       <div class="mb-14 max-w-3xl">
 
         <p class="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#0077cc]">
-          Nuestro portafolio
+          {{ 'Nuestro portafolio' | t }}
         </p>
 
         <h2 class="text-3xl font-bold tracking-tight text-[#002d54] sm:text-4xl">
-          Gases para cada aplicación
+          {{ 'Gases para cada aplicación' | t }}
         </h2>
 
         <p class="mt-5 text-base leading-8 text-slate-600">
-          Explore nuestras principales categorías de gases y descubra cómo pueden contribuir a diferentes procesos industriales, técnicos y sanitarios.
+          {{ 'Explore nuestras principales categorías de gases y descubra cómo pueden contribuir a diferentes procesos industriales, técnicos y sanitarios.' | t }}
         </p>
 
       </div>
@@ -129,21 +129,21 @@
               <div class="min-w-0">
 
                 <h3 class="text-xl font-bold text-[#002d54]">
-                  {{ gas.nombre }}
+                  {{ gas.nombre | t }}
                 </h3>
 
                 <p class="mt-4 text-sm leading-7 text-slate-600">
-                  {{ gas.descripcion }}
+                  {{ gas.descripcion | t }}
                 </p>
 
                 <div class="mt-6 border-t border-slate-100 pt-5">
 
                   <p class="text-xs font-bold uppercase tracking-wider text-[#0077cc]">
-                    Ejemplos y aplicaciones
+                    {{ 'Ejemplos y aplicaciones' | t }}
                   </p>
 
                   <p class="mt-2 text-sm leading-6 text-slate-500">
-                    {{ gas.ejemplos }}
+                    {{ gas.ejemplos | t }}
                   </p>
 
                 </div>
@@ -171,28 +171,28 @@
       <div class="order-2 lg:order-1">
 
         <p class="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#0077cc]">
-          Gases industriales y especiales
+          {{ 'Gases industriales y especiales' | t }}
         </p>
 
         <h2 class="text-3xl font-bold leading-tight tracking-tight text-[#002d54] sm:text-4xl">
-          Una amplia variedad de gases y mezclas
+          {{ 'Una amplia variedad de gases y mezclas' | t }}
         </h2>
 
         <p class="mt-6 text-base leading-8 text-slate-600">
-          Desde gases de uso industrial hasta mezclas de alta pureza, without ofrece soluciones para procesos de fabricación, investigación, análisis, atención médica y otras aplicaciones.
+          {{ 'Desde gases de uso industrial hasta mezclas de alta pureza, without ofrece soluciones para procesos de fabricación, investigación, análisis, atención médica y otras aplicaciones.' | t }}
         </p>
 
         <p class="mt-5 text-base leading-8 text-slate-600">
-          La selección del gas adecuado, su pureza y su modalidad de suministro son factores importantes para el desempeño de cada proceso.
+          {{ 'La selección del gas adecuado, su pureza y su modalidad de suministro son factores importantes para el desempeño de cada proceso.' | t }}
         </p>
 
         <div class="mt-8 flex flex-wrap gap-3">
 
-          <span class="rounded-full border border-sky-100 bg-[#eaf4fc] px-4 py-2 text-sm font-medium text-[#005b9f]">Oxígeno</span>
-          <span class="rounded-full border border-sky-100 bg-[#eaf4fc] px-4 py-2 text-sm font-medium text-[#005b9f]">Nitrógeno</span>
-          <span class="rounded-full border border-sky-100 bg-[#eaf4fc] px-4 py-2 text-sm font-medium text-[#005b9f]">Argón</span>
+          <span class="rounded-full border border-sky-100 bg-[#eaf4fc] px-4 py-2 text-sm font-medium text-[#005b9f]">{{ 'Oxígeno' | t }}</span>
+          <span class="rounded-full border border-sky-100 bg-[#eaf4fc] px-4 py-2 text-sm font-medium text-[#005b9f]">{{ 'Nitrógeno' | t }}</span>
+          <span class="rounded-full border border-sky-100 bg-[#eaf4fc] px-4 py-2 text-sm font-medium text-[#005b9f]">{{ 'Argón' | t }}</span>
           <span class="rounded-full border border-sky-100 bg-[#eaf4fc] px-4 py-2 text-sm font-medium text-[#005b9f]">CO₂</span>
-          <span class="rounded-full border border-sky-100 bg-[#eaf4fc] px-4 py-2 text-sm font-medium text-[#005b9f]">Hidrógeno</span>
+          <span class="rounded-full border border-sky-100 bg-[#eaf4fc] px-4 py-2 text-sm font-medium text-[#005b9f]">{{ 'Hidrógeno' | t }}</span>
 
         </div>
 
@@ -200,7 +200,7 @@
 
       <div class="order-1 overflow-hidden rounded-2xl bg-[#eaf4fc] lg:order-2">
 
-        <img src="https://images.pexels.com/photos/9338479/pexels-photo-9338479.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Gases industriales y especializados" loading="lazy" class="aspect-4/3 w-full object-cover" />
+        <img src="https://images.pexels.com/photos/9338479/pexels-photo-9338479.jpeg?auto=compress&cs=tinysrgb&w=1400" [attr.alt]="'Gases industriales y especializados' | t" loading="lazy" class="aspect-4/3 w-full object-cover" />
 
       </div>
 
@@ -217,15 +217,15 @@
       <div class="mb-14 max-w-3xl">
 
         <p class="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-sky-300">
-          Soluciones de abastecimiento
+          {{ 'Soluciones de abastecimiento' | t }}
         </p>
 
         <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
-          Modos de suministro
+          {{ 'Modos de suministro' | t }}
         </h2>
 
         <p class="mt-5 text-base leading-8 text-blue-100">
-          Ofrecemos distintas alternativas para responder a necesidades de volumen, pureza, disponibilidad y continuidad operativa.
+          {{ 'Ofrecemos distintas alternativas para responder a necesidades de volumen, pureza, disponibilidad y continuidad operativa.' | t }}
         </p>
 
       </div>
@@ -249,11 +249,11 @@
             </div>
 
             <h3 class="text-xl font-bold text-white">
-              {{ suministro.titulo }}
+              {{ suministro.titulo | t }}
             </h3>
 
             <p class="mt-4 text-sm leading-7 text-blue-100/90">
-              {{ suministro.descripcion }}
+              {{ suministro.descripcion | t }}
             </p>
 
           </article>
@@ -274,26 +274,26 @@
 
       <div class="overflow-hidden rounded-2xl bg-slate-100">
 
-        <img src="https://images.pexels.com/photos/4440143/pexels-photo-4440143.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Sistemas de abastecimiento industrial" loading="lazy" class="aspect-4/3 w-full object-cover" />
+        <img src="https://images.pexels.com/photos/4440143/pexels-photo-4440143.jpeg?auto=compress&cs=tinysrgb&w=1400" [attr.alt]="'Sistemas de abastecimiento industrial' | t" loading="lazy" class="aspect-4/3 w-full object-cover" />
 
       </div>
 
       <div>
 
         <p class="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#0077cc]">
-          Flexibilidad y continuidad
+          {{ 'Flexibilidad y continuidad' | t }}
         </p>
 
         <h2 class="text-3xl font-bold leading-tight tracking-tight text-[#002d54] sm:text-4xl">
-          El suministro adecuado para cada operación
+          {{ 'El suministro adecuado para cada operación' | t }}
         </h2>
 
         <p class="mt-6 text-base leading-8 text-slate-600">
-          Cada instalación tiene necesidades particulares. Algunas operaciones requieren cilindros portátiles, mientras que otras necesitan abastecimiento líquido o soluciones de producción continua.
+          {{ 'Cada instalación tiene necesidades particulares. Algunas operaciones requieren cilindros portátiles, mientras que otras necesitan abastecimiento líquido o soluciones de producción continua.' | t }}
         </p>
 
         <p class="mt-5 text-base leading-8 text-slate-600">
-          La elección de la modalidad depende de factores como el consumo, las condiciones del proceso, la infraestructura disponible y los requisitos de seguridad.
+          {{ 'La elección de la modalidad depende de factores como el consumo, las condiciones del proceso, la infraestructura disponible y los requisitos de seguridad.' | t }}
         </p>
 
         <div class="mt-8 flex items-start gap-4 rounded-xl border border-sky-100 bg-[#f4f7fb] p-5">
@@ -304,10 +304,10 @@
 
           <div>
             <h3 class="font-bold text-[#002d54]">
-              Soluciones adaptadas
+              {{ 'Soluciones adaptadas' | t }}
             </h3>
             <p class="mt-2 text-sm leading-7 text-slate-600">
-              Diferentes modalidades de suministro para responder a los requerimientos de cada cliente.
+              {{ 'Diferentes modalidades de suministro para responder a los requerimientos de cada cliente.' | t }}
             </p>
           </div>
 
@@ -328,36 +328,36 @@
       <div>
 
         <p class="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#0077cc]">
-          Tecnología y aplicaciones
+          {{ 'Tecnología y aplicaciones' | t }}
         </p>
 
         <h2 class="text-3xl font-bold leading-tight tracking-tight text-[#002d54] sm:text-4xl">
-          Equipos y soluciones para sus procesos
+          {{ 'Equipos y soluciones para sus procesos' | t }}
         </h2>
 
         <p class="mt-6 text-base leading-8 text-slate-600">
-          Además de los gases, without ofrece soluciones de equipos y aplicaciones orientadas a mejorar el uso de los gases industriales, de proceso y especiales.
+          {{ 'Además de los gases, without ofrece soluciones de equipos y aplicaciones orientadas a mejorar el uso de los gases industriales, de proceso y especiales.' | t }}
         </p>
 
         <p class="mt-5 text-base leading-8 text-slate-600">
-          Los equipos adecuados permiten gestionar el suministro, controlar parámetros y contribuir al funcionamiento eficiente de distintas instalaciones.
+          {{ 'Los equipos adecuados permiten gestionar el suministro, controlar parámetros y contribuir al funcionamiento eficiente de distintas instalaciones.' | t }}
         </p>
 
         <div class="mt-8 space-y-4">
 
           <div class="flex items-start gap-3">
             <i class="pi pi-check-circle mt-1 text-lg text-[#0077cc]"></i>
-            <p class="text-sm leading-7 text-slate-600">Equipos de manejo y distribución de gases.</p>
+            <p class="text-sm leading-7 text-slate-600">{{ 'Equipos de manejo y distribución de gases.' | t }}</p>
           </div>
 
           <div class="flex items-start gap-3">
             <i class="pi pi-check-circle mt-1 text-lg text-[#0077cc]"></i>
-            <p class="text-sm leading-7 text-slate-600">Soluciones para aplicaciones industriales especializadas.</p>
+            <p class="text-sm leading-7 text-slate-600">{{ 'Soluciones para aplicaciones industriales especializadas.' | t }}</p>
           </div>
 
           <div class="flex items-start gap-3">
             <i class="pi pi-check-circle mt-1 text-lg text-[#0077cc]"></i>
-            <p class="text-sm leading-7 text-slate-600">Tecnologías orientadas a mejorar la eficiencia operativa.</p>
+            <p class="text-sm leading-7 text-slate-600">{{ 'Tecnologías orientadas a mejorar la eficiencia operativa.' | t }}</p>
           </div>
 
         </div>
@@ -366,7 +366,7 @@
 
       <div class="overflow-hidden rounded-2xl bg-white shadow-lg shadow-slate-200/60">
 
-        <img src="https://images.pexels.com/photos/8973132/pexels-photo-8973132.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Equipos y tecnología industrial without" loading="lazy" class="aspect-4/3 w-full object-cover" />
+        <img src="https://images.pexels.com/photos/8973132/pexels-photo-8973132.jpeg?auto=compress&cs=tinysrgb&w=1400" [attr.alt]="'Equipos y tecnología industrial without' | t" loading="lazy" class="aspect-4/3 w-full object-cover" />
 
       </div>
 
@@ -383,15 +383,15 @@
       <div class="mx-auto mb-14 max-w-3xl text-center">
 
         <p class="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#0077cc]">
-          Valor para nuestros clientes
+          {{ 'Valor para nuestros clientes' | t }}
         </p>
 
         <h2 class="text-3xl font-bold tracking-tight text-[#002d54] sm:text-4xl">
-          ¿Por qué elegir nuestras soluciones?
+          {{ '¿Por qué elegir nuestras soluciones?' | t }}
         </h2>
 
         <p class="mt-5 text-base leading-8 text-slate-600">
-          Combinamos gases, tecnología y conocimiento especializado para contribuir al desarrollo de diferentes operaciones.
+          {{ 'Combinamos gases, tecnología y conocimiento especializado para contribuir al desarrollo de diferentes operaciones.' | t }}
         </p>
 
       </div>
@@ -407,11 +407,11 @@
             </div>
 
             <h3 class="text-lg font-bold text-[#002d54]">
-              {{ beneficio.titulo }}
+              {{ beneficio.titulo | t }}
             </h3>
 
             <p class="mt-4 text-sm leading-7 text-slate-600">
-              {{ beneficio.descripcion }}
+              {{ beneficio.descripcion | t }}
             </p>
 
           </article>
@@ -436,21 +436,21 @@
       <div class="max-w-2xl">
 
         <p class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-sky-300">
-          Estamos para ayudarle
+          {{ 'Estamos para ayudarle' | t }}
         </p>
 
         <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
-          ¿Necesita una solución para su empresa?
+          {{ '¿Necesita una solución para su empresa?' | t }}
         </h2>
 
         <p class="mt-5 text-base leading-8 text-blue-100">
-          Comuníquese con nosotros para conocer más sobre nuestros gases, equipos y alternativas de abastecimiento.
+          {{ 'Comuníquese con nosotros para conocer más sobre nuestros gases, equipos y alternativas de abastecimiento.' | t }}
         </p>
 
       </div>
 
       <a routerLink="/contacto" class="inline-flex shrink-0 items-center justify-center gap-3 rounded-md bg-white px-8 py-4 text-sm font-bold text-[#002d54] transition-all hover:-translate-y-0.5 hover:bg-sky-100">
-        Contáctenos
+        {{ 'Contáctenos' | t }}
         <i class="pi pi-arrow-right text-sm"></i>
       </a>
 

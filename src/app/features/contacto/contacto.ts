@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
+import { TraducirPipe } from '../../core/i18n/idioma';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-contacto',
-  imports: [RouterLink],
+  imports: [TraducirPipe, RouterLink],
   templateUrl: './contacto.html',
 })
 export class Contacto {

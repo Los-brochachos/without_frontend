@@ -12,3 +12,8 @@ export interface TrabajadorRegistro extends TrabajadorDatos {
   licenciaConducir?: string; categoriaLicencia?: string; fechaVencimientoLicencia?: string;
   turno?: string; nivelIngles?: string; especialidad?: string; nivelTecnico?: string;
 }
+/** GET /conductores y /conductores/activos (dto/trabajador/conductor/ConductorResponse.java). */
+export interface ConductorResponse extends TrabajadorResponse {
+  licenciaConducir: string; categoriaLicencia: string; fechaVencimientoLicencia: string;
+  fechaCreacion?: string; fechaActualizacion?: string;
+}

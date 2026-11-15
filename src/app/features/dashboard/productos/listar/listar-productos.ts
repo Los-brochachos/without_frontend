@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProductoService } from '../../../../core/services/pedido/producto-service';
 import { Auth } from '../../../../core/auth/auth';
+import { tieneRol } from '../../../../core/auth/access';
 import { ProductoResponse } from '../../../../core/models/ProductoModel';
 
 type FiltroEstado = 'ACTIVO' | 'INACTIVO' | 'TODOS';
@@ -23,7 +24,7 @@ export class CatalogoProductos {
   private readonly auth = inject(Auth);
   readonly esCliente = computed(() => this.auth.usuario()?.rol === 'CLIENTE');
   /** Solo ADMIN gestiona el catálogo (POST/PUT/DELETE /productos). */
-  readonly puedeGestionar = computed(() => this.auth.usuario()?.rol === 'ADMIN');
+  readonly puedeGestionar = computed(() => tieneRol(this.auth.usuario()?.rol, 'ADMIN'));
   readonly productos = signal<ProductoResponse[]>([]);
   readonly loading = signal(false);
   readonly error = signal('');

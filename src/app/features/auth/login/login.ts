@@ -10,9 +10,10 @@ import { homeForRole } from '../../../core/auth/access';
 import { Auth } from '../../../core/auth/auth';
 import { AuthRequest } from '../../../core/auth/auth.models';
 import { switchMap, finalize } from 'rxjs';
+import { TraducirPipe } from '../../../core/i18n/idioma';
 
 @Component({
-  imports: [
+  imports: [TraducirPipe, 
     ReactiveFormsModule,
     InputTextModule,
     InputPasswordModule,

@@ -26,11 +26,11 @@
       </div>
 
       <h1 class="wrap-break-word text-2xl font-bold tracking-tight text-[#002d54] sm:text-3xl">
-        {{ idEdicion() === null ? 'Programar atención' : 'Editar atención #' + idEdicion() }}
+        Programar atención
       </h1>
 
       <p class="mt-2 text-sm leading-relaxed text-slate-500">
-        {{ idEdicion() === null ? 'Asigna un pedido, define el horario y selecciona los recursos disponibles.' : 'Actualiza el horario y los recursos asignados a esta atención.' }}
+        Asigna un pedido, define el horario y selecciona los recursos disponibles.
       </p>
 
     </div>
@@ -103,11 +103,11 @@
           </p>
 
           <h2 role="status" class="mt-2 text-xl font-bold text-[#002d54] sm:text-2xl">
-            {{ idEdicion() === null ? 'Atención programada' : 'Atención actualizada' }}
+            Atención programada
           </h2>
 
           <p class="mt-2 text-sm text-slate-600">
-            La atención #{{ atencion.idAtencion }} se ha {{ idEdicion() === null ? 'programado' : 'actualizado' }} correctamente.
+            La atención #{{ atencion.idAtencion }} se ha programado correctamente.
           </p>
         </div>
 
@@ -194,7 +194,7 @@
 
     </div>
 
-  } @else if (idEdicion() === null && !pendientes().length) {
+  } @else if (!pendientes().length) {
 
     <!-- SIN PEDIDOS PENDIENTES -->
     <div role="status" class="flex min-h-60 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-10 text-center shadow-sm">
@@ -592,7 +592,7 @@
           }
 
           <span>
-            {{ guardando() ? 'Guardando…' : (idEdicion() === null ? 'Guardar programación' : 'Guardar cambios') }}
+            {{ guardando() ? 'Guardando…' : 'Guardar programación' }}
           </span>
 
         </button>

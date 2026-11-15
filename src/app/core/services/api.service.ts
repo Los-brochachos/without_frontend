@@ -23,9 +23,11 @@ export class ApiService {
       headers: { Authorization: `Bearer ${this.auth.getAccessToken()}` },
     });
   }
-  delete<T>(path: string) {
+  /** `body` es opcional: algunos endpoints (p. ej. DELETE /cisternas) reciben los datos en el cuerpo. */
+  delete<T>(path: string, body?: unknown) {
     return this.http.delete<T>(`${environment.apiUrl}/api/v1/${path}`, {
       headers: { Authorization: `Bearer ${this.auth.getAccessToken()}` },
+      body,
     });
   }
   patch<T>(path: string, body: unknown) {

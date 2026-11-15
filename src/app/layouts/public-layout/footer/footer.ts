@@ -1,7 +1,8 @@
 import { Component, signal } from '@angular/core';
+import { TraducirPipe } from '../../../core/i18n/idioma';
 
 @Component({
-  imports: [],
+  imports: [TraducirPipe, ],
   selector: 'app-footer',
   templateUrl: './footer.html',
   styles: `

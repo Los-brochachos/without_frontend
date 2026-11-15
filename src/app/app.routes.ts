@@ -5,7 +5,6 @@ import { DASHBOARD_ROLES } from './features/dashboard/dashboard-data';
 // Módulos del personal (todos los roles salvo CLIENTE). Qué rol ve cuál lo decide dashboard-data.ts.
 const sections = [...new Set(Object.entries(DASHBOARD_ROLES).filter(([rol]) => rol !== 'CLIENTE').flatMap(([, config]) => config.sections.map(section => section.key)))];
 const vistaRol = () => import('./features/dashboard/vista-rol/vista-rol').then(m => m.VistaRol);
-const listado = () => import('./features/dashboard/compartido/listado/listado').then(m => m.Listado);
 // Pantalla de cuenta compartida (seguridad / preferencias / ayuda) para cliente y personal.
 const opcionesCuenta = () => import('./features/dashboard/cuenta/opciones').then(m => m.OpcionesCuenta);
 const catalogo = () => import('./features/dashboard/productos/listar/listar-productos').then(m => m.CatalogoProductos);
@@ -24,7 +23,7 @@ export const routes: Routes = [
       { path: 'pedidos/editar', data: { sectionKey: 'pedidos' }, loadComponent: () => import('./features/dashboard/pedidos/editar/editar-pedido').then(m => m.EditarPedido) },
       { path: 'pedidos/:id/editar', data: { sectionKey: 'pedidos' }, loadComponent: () => import('./features/dashboard/pedidos/editar/editar-pedido').then(m => m.EditarPedido) },
       { path: 'pedidos/:id', data: { sectionKey: 'pedidos' }, loadComponent: () => import('./features/dashboard/pedidos/detalle/detalle-pedido').then(m => m.DetallePedido) },
-      { path: 'pedidos', data: { sectionKey: 'pedidos' }, loadComponent: listado },
+      { path: 'pedidos', data: { sectionKey: 'pedidos' }, loadComponent: () => import('./features/dashboard/pedidos/listar/mis-pedidos').then(m => m.MisPedidos) },
       { path: 'productos', data: { sectionKey: 'productos' }, loadComponent: catalogo },
       { path: 'seguimiento/:id', data: { sectionKey: 'seguimiento' }, loadComponent: () => import('./features/dashboard/pedidos/seguimiento/seguimiento').then(m => m.Seguimiento) },
       { path: 'seguimiento', data: { sectionKey: 'seguimiento' }, loadComponent: () => import('./features/dashboard/pedidos/seguimiento/seguimiento').then(m => m.Seguimiento) },
@@ -42,16 +41,26 @@ export const routes: Routes = [
       // Personal: cambiar contraseña y preferencias (tema, formato de fecha). El centro de ayuda es solo del cliente por ahora.
       ...['seguridad', 'preferencias'].map(pagina => ({ path: pagina, data: { pagina }, loadComponent: opcionesCuenta })),
       { path: 'trabajadores/nuevo', data: { sectionKey: 'trabajadores', roles: ['ADMIN'], modoTrabajador: 'crear' }, loadComponent: () => import('./features/dashboard/trabajadores/formulario/formulario-trabajador').then(m => m.FormularioTrabajador) },
-      { path: 'trabajadores/:id/editar', data: { sectionKey: 'trabajadores', roles: ['ADMIN'], modoTrabajador: 'editar' }, loadComponent: () => import('./features/dashboard/trabajadores/formulario/formulario-trabajador').then(m => m.FormularioTrabajador) },
+      { path: 'trabajadores/editar', data: { sectionKey: 'trabajadores', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/trabajadores/editar/editar-trabajador').then(m => m.EditarTrabajador) },
+      { path: 'trabajadores/:id/editar', data: { sectionKey: 'trabajadores', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/trabajadores/editar/editar-trabajador').then(m => m.EditarTrabajador) },
       { path: 'trabajadores/:id', data: { sectionKey: 'trabajadores', roles: ['ADMIN'], modoTrabajador: 'ver' }, loadComponent: () => import('./features/dashboard/trabajadores/formulario/formulario-trabajador').then(m => m.FormularioTrabajador) },
       { path: 'trabajadores', data: { sectionKey: 'trabajadores', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/trabajadores/listar/listar-trabajadores').then(m => m.ListadoTrabajadores) },
       { path: 'productos/nuevo', data: { sectionKey: 'productos', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/productos/formulario/formulario-producto').then(m => m.FormularioProducto) },
-      { path: 'productos/:id/editar', data: { sectionKey: 'productos', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/productos/formulario/formulario-producto').then(m => m.FormularioProducto) },
+      { path: 'productos/editar', data: { sectionKey: 'productos', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/productos/editar/editar-producto').then(m => m.EditarProducto) },
+      { path: 'productos/:id/editar', data: { sectionKey: 'productos', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/productos/editar/editar-producto').then(m => m.EditarProducto) },
+      { path: 'clientes/editar', data: { sectionKey: 'clientes', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/clientes/editar/editar-cliente').then(m => m.EditarCliente) },
+      { path: 'clientes/:id/editar', data: { sectionKey: 'clientes', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/clientes/editar/editar-cliente').then(m => m.EditarCliente) },
+      { path: 'cisternas/nueva', data: { sectionKey: 'cisternas', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/cisternas/crear/crear-cisterna').then(m => m.CrearCisterna) },
+      { path: 'cisternas/editar', data: { sectionKey: 'cisternas', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/cisternas/editar/editar-cisterna').then(m => m.EditarCisterna) },
+      { path: 'cisternas/:id/editar', data: { sectionKey: 'cisternas', roles: ['ADMIN'] }, loadComponent: () => import('./features/dashboard/cisternas/editar/editar-cisterna').then(m => m.EditarCisterna) },
       { path: 'atenciones/nueva', data: { sectionKey: 'atenciones', roles: ['PROGRAMADOR'] }, loadComponent: () => import('./features/dashboard/atenciones/formulario/formulario-atencion').then(m => m.ProgramarAtencion) },
       { path: 'atenciones/asignadas/:id', data: { sectionKey: 'atenciones', roles: ['CONDUCTOR'] }, loadComponent: () => import('./features/dashboard/atenciones/detalle/detalle-atencion').then(m => m.AtencionConductor) },
-      { path: 'atenciones/:id/editar', data: { sectionKey: 'atenciones', roles: ['PROGRAMADOR'] }, loadComponent: () => import('./features/dashboard/atenciones/formulario/formulario-atencion').then(m => m.ProgramarAtencion) },
+      { path: 'atenciones/editar', data: { sectionKey: 'atenciones', roles: ['PROGRAMADOR'] }, loadComponent: () => import('./features/dashboard/atenciones/editar/editar-atencion').then(m => m.EditarAtencion) },
+      { path: 'atenciones/:id/editar', data: { sectionKey: 'atenciones', roles: ['PROGRAMADOR'] }, loadComponent: () => import('./features/dashboard/atenciones/editar/editar-atencion').then(m => m.EditarAtencion) },
       { path: 'atenciones/:id/cancelar', data: { sectionKey: 'atenciones', roles: ['PROGRAMADOR'] }, loadComponent: () => import('./features/dashboard/atenciones/cancelar/cancelar-atencion').then(m => m.CancelarAtencion) },
-      // Cada módulo abre la pantalla que dashboard-data.ts asigna al rol (o el listado genérico).
+      { path: 'fallas/nueva', data: { sectionKey: 'fallas', roles: ['TECNICO'] }, loadComponent: () => import('./features/dashboard/fallas/formulario/reportar-falla').then(m => m.ReportarFalla) },
+      { path: 'historial/nuevo', data: { sectionKey: 'historial', roles: ['TECNICO'] }, loadComponent: () => import('./features/dashboard/mantenimiento/formulario/registrar-mantenimiento').then(m => m.RegistrarMantenimiento) },
+      // Cada módulo abre la pantalla que dashboard-data.ts asigna al rol .
       ...sections.map(key => ({ path: key, data: { sectionKey: key, vistaRol: key }, loadComponent: vistaRol })),
     ],
   },

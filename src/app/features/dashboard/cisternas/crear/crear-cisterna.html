@@ -1,0 +1,55 @@
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 text-slate-800 sm:px-6 lg:py-9">
+
+  <a routerLink="/dashboard/cisternas" class="inline-flex w-fit items-center gap-2 text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54]">
+    <i class="pi pi-arrow-left text-xs"></i> Volver a Cisternas
+  </a>
+
+  <!-- ENCABEZADO -->
+  <div>
+    <div class="mb-2 flex items-center gap-2">
+      <span class="h-1.5 w-1.5 rounded-full bg-[#0077cc]"></span>
+      <span class="text-xs font-bold uppercase tracking-widest text-[#0077cc]">Flota · Administración</span>
+    </div>
+    <h1 class="text-2xl font-bold tracking-tight text-[#002d54] sm:text-3xl">Crear cisterna</h1>
+    <p class="mt-2 text-sm text-slate-500">Registra una cisterna de la flota. Quedará <strong>ACTIVA</strong> y disponible para programar atenciones.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center gap-4 border-b border-slate-100 px-6 py-5 sm:px-8">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eaf4fc] text-[#0077cc]"><i class="pi pi-truck text-xl"></i></div>
+      <div>
+        <h2 class="text-lg font-bold text-[#002d54]">Datos de la cisterna</h2>
+        <p class="mt-1 text-sm text-slate-500">Todos los campos son obligatorios. La placa y el nombre no pueden repetirse.</p>
+      </div>
+    </div>
+
+    <fieldset [disabled]="guardando()" class="grid gap-6 px-6 py-6 sm:grid-cols-2 sm:px-8">
+      <div class="flex flex-col gap-2">
+        <label for="cisterna-placa" class="text-sm font-semibold text-slate-700">Placa *</label>
+        <input pInputText id="cisterna-placa" formControlName="placa" maxlength="20" placeholder="Ej.: ABC-123" autocomplete="off" [attr.aria-invalid]="invalido('placa')" class="h-12! w-full! rounded-xl! uppercase" />
+        @if (invalido('placa')) { <p class="text-xs text-red-700">Ingresa la placa (máx. 20 caracteres).</p> }
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="cisterna-capacidad" class="text-sm font-semibold text-slate-700">Capacidad *</label>
+        <input pInputText id="cisterna-capacidad" type="number" min="0.01" max="99999.99" step="0.01" formControlName="capacidad" placeholder="Ej.: 12000" [attr.aria-invalid]="invalido('capacidad')" class="h-12! w-full! rounded-xl!" />
+        @if (invalido('capacidad')) { <p class="text-xs text-red-700">Mayor a 0, hasta 99 999.99 y con 2 decimales como máximo.</p> }
+      </div>
+      <div class="flex flex-col gap-2 sm:col-span-2">
+        <label for="cisterna-nombre" class="text-sm font-semibold text-slate-700">Nombre *</label>
+        <input pInputText id="cisterna-nombre" formControlName="nombre" maxlength="100" placeholder="Ej.: Cisterna Norte 01" autocomplete="off" [attr.aria-invalid]="invalido('nombre')" class="h-12! w-full! rounded-xl!" />
+        @if (invalido('nombre')) { <p class="text-xs text-red-700">Ingresa el nombre (máx. 100 caracteres).</p> }
+      </div>
+    </fieldset>
+
+    @if (error()) {
+      <p role="alert" class="mx-6 mb-2 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-8"><i class="pi pi-exclamation-circle mt-0.5"></i>{{ error() }}</p>
+    }
+
+    <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-6 py-5 sm:flex-row sm:justify-end sm:px-8">
+      <a routerLink="/dashboard/cisternas" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancelar</a>
+      <button type="submit" [disabled]="guardando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#007ac3] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#0064a3] disabled:cursor-not-allowed disabled:opacity-60">
+        <i class="pi" [class.pi-spin]="guardando()" [class.pi-spinner]="guardando()" [class.pi-plus]="!guardando()"></i>{{ guardando() ? 'Registrando…' : 'Crear cisterna' }}
+      </button>
+    </div>
+  </form>
+</section>

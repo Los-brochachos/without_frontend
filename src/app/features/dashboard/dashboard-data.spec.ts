@@ -21,8 +21,17 @@ describe('Configuración de módulos por rol', () => {
 
   it('cada rol tiene su variante solo donde hace falta', async () => {
     expect((await seccionDe('PROGRAMADOR', 'pedidos')!.pantalla!()).name).toContain('PedidosProgramador');
-    expect(seccionDe('ADMIN', 'pedidos')!.pantalla).toBeUndefined(); // listado genérico paginado
+    expect((await seccionDe('ADMIN', 'pedidos')!.pantalla!()).name).toContain('ListarPedidos');
+    expect((await seccionDe('CLIENTE', 'pedidos')!.pantalla!()).name).toContain('MisPedidos');
     expect(seccionDe('CONDUCTOR', 'atenciones')!.path).toBe('atenciones/asignadas');
+  });
+
+  it('cada módulo del personal abre su propia pantalla (ya no hay listado genérico)', async () => {
+    const esperadas: Record<string, string> = { fallas: 'ListarFallas', cisternas: 'ListarCisternas', conductores: 'ListarConductores',
+      historial: 'ListarMantenimiento', usuarios: 'ListarUsuarios', clientes: 'ListarClientes', atenciones: 'ConsultarAtenciones' };
+    for (const [key, nombre] of Object.entries(esperadas)) expect((await seccionDe('ADMIN', key)!.pantalla!()).name).toContain(nombre);
+    Object.entries(DASHBOARD_ROLES).filter(([rol]) => rol !== 'CLIENTE').forEach(([rol, c]) =>
+      c.sections.forEach(s => expect(s.pantalla, `${rol}/${s.key}`).toBeTypeOf('function')));
   });
 
   it('si el rol no tiene el módulo, no existe para él y el guard lo bloquea', () => {

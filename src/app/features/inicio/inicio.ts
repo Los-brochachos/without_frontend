@@ -1,11 +1,12 @@
 
 import { Component } from '@angular/core';
+import { TraducirPipe } from '../../core/i18n/idioma';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [RouterLink],
+  imports: [TraducirPipe, RouterLink],
   templateUrl: './inicio.html'
 })
 export class Inicio {

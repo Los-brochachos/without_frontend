@@ -1,71 +1,122 @@
 
-<header class="relative z-30 flex h-16 w-full items-center justify-between border-b border-white/10 bg-[#002d54] px-4 shadow-sm sm:px-6 lg:h-18 lg:px-8">
+<header class="relative z-30 flex h-16 w-full items-center justify-between gap-4 border-b border-white/10 bg-[#002d54] px-4 shadow-sm sm:px-6 lg:h-18 lg:px-8">
 
-  <!-- TÍTULO DEL DASHBOARD -->
+  <!-- IDENTIDAD DEL DASHBOARD -->
   <div class="flex min-w-0 items-center gap-3">
 
-    <div class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/10 sm:flex">
-      <i class="pi pi-th-large text-lg text-sky-200"></i>
+    <div class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/10 sm:flex">
+      <i class="pi pi-th-large text-lg text-sky-200" aria-hidden="true"></i>
     </div>
 
     <div class="min-w-0">
-      <h1 class="truncate text-base font-semibold tracking-tight text-white sm:text-lg">Panel de control</h1>
-      <p class="hidden text-xs text-blue-200/80 sm:block">Sistema de Monitoreo de Atención</p>
+      <h1 class="truncate text-base font-semibold tracking-tight text-white sm:text-lg">
+        Panel de control
+      </h1>
+
+      <p class="hidden truncate text-xs text-blue-200 sm:block">
+        Sistema de Monitoreo de Atención
+      </p>
     </div>
 
   </div>
 
   <!-- ACCIONES DEL HEADER -->
-  <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+  <div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
+
+    <!-- CAMBIAR TEMA -->
+    <button type="button" (click)="preferencias.alternarTema()" [attr.aria-pressed]="preferencias.oscuroActivo()" [attr.aria-label]="preferencias.oscuroActivo() ? 'Activar modo claro' : 'Activar modo oscuro'" [title]="preferencias.oscuroActivo() ? 'Modo claro' : 'Modo oscuro'" class="flex h-10 w-10 items-center justify-center rounded-lg text-blue-100 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 active:scale-95">
+
+      <i class="pi text-lg" [class.pi-sun]="preferencias.oscuroActivo()" [class.pi-moon]="!preferencias.oscuroActivo()" aria-hidden="true"></i>
+
+    </button>
 
     <!-- NOTIFICACIONES -->
-    <button type="button" aria-label="Notificaciones" title="Notificaciones" class="relative flex h-10 w-10 items-center justify-center rounded-xl text-white transition-all duration-200 hover:bg-white/10 active:scale-95">
-      <i class="bi bi-bell text-xl"></i>
+    <button type="button" aria-label="Notificaciones" title="Notificaciones" class="relative flex h-10 w-10 items-center justify-center rounded-lg text-blue-100 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 active:scale-95">
+
+      <i class="pi pi-bell text-lg" aria-hidden="true"></i>
+
     </button>
 
     <!-- SEPARADOR -->
-    <div class="mx-1 hidden h-8 w-px bg-white/15 sm:block"></div>
+    <div class="mx-2 hidden h-8 w-px bg-white/15 sm:block" aria-hidden="true"></div>
 
-    <!-- MENÚ DESPLEGABLE -->
+    <!-- MENÚ DE USUARIO -->
     <p-menu #menu [model]="items()" [popup]="true" appendTo="body" styleClass="without-user-menu">
 
-      <!-- INFORMACIÓN DE CUENTA -->
+      <!-- INFORMACIÓN DE LA CUENTA -->
       <ng-template #start>
         @if (usuario(); as user) {
-          <div class="mb-1 border-b border-slate-200 bg-white px-4 py-3">
+
+          <div class="border-b border-slate-200 px-4 pb-4 pt-3">
 
             <div class="flex items-center gap-3">
 
-              <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-100 text-base font-bold text-[#002d54]">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-sky-100 text-lg font-semibold text-[#002d54]">
                 {{ user.correo.charAt(0).toUpperCase() }}
               </div>
 
               <div class="min-w-0 flex-1">
-                <p class="text-sm font-semibold text-slate-800">Mi cuenta</p>
-                <p class="truncate text-xs text-slate-500">{{ user.correo }}</p>
-                <span class="mt-1 inline-flex rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-semibold capitalize text-[#007ac3]">{{ user.rol.toLowerCase() }}</span>
+                <p class="text-sm font-semibold text-[#002d54]">
+                  Mi cuenta
+                </p>
+
+                <p class="mt-0.5 truncate text-xs text-slate-500" [title]="user.correo">
+                  {{ user.correo }}
+                </p>
+
+                <span class="mt-1.5 inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold capitalize text-slate-600">
+                  <i class="pi pi-user text-[9px]" aria-hidden="true"></i>
+                  {{ user.rol.toLowerCase() }}
+                </span>
               </div>
 
             </div>
 
           </div>
+
+          <div class="px-4 pb-1 pt-3">
+            <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              Cuenta y configuración
+            </p>
+          </div>
+
         }
       </ng-template>
 
       <!-- OPCIONES DEL MENÚ -->
       <ng-template #item let-item>
-        <a pRipple [routerLink]="item.routerLink || null" (click)="item.command?.({ originalEvent: $event, item: item })" class="without-menu-link flex w-full cursor-pointer items-center gap-3 text-sm font-medium transition-colors duration-150" [class.text-red-600]="item.label === 'Cerrar sesión'" [class.text-slate-700]="item.label !== 'Cerrar sesión'">
-          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" [class.bg-red-50]="item.label === 'Cerrar sesión'" [class.bg-sky-50]="item.label !== 'Cerrar sesión'">
-            <i [class]="item.icon" [class.text-red-500]="item.label === 'Cerrar sesión'" [class.text-[#007ac3]]="item.label !== 'Cerrar sesión'"></i>
+
+        <a pRipple [routerLink]="item.routerLink || null" class="without-menu-link group flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2.5 transition-colors" [class.hover:bg-red-50]="item.label === 'Cerrar sesión'" [class.hover:bg-slate-100]="item.label !== 'Cerrar sesión'">
+
+          <!-- ICONO -->
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors" [class.bg-red-50]="item.label === 'Cerrar sesión'" [class.bg-slate-100]="item.label !== 'Cerrar sesión'">
+
+            <i [class]="item.icon" [class.text-red-600]="item.label === 'Cerrar sesión'" [class.text-slate-600]="item.label !== 'Cerrar sesión'" aria-hidden="true"></i>
+
           </span>
 
-          <span class="min-w-0 flex-1">{{ item.label }}</span>
+          <!-- INFORMACIÓN DE LA OPCIÓN -->
+          <span class="flex min-w-0 flex-1 flex-col gap-0.5">
 
+            <span class="text-sm font-medium" [class.text-red-700]="item.label === 'Cerrar sesión'" [class.text-slate-700]="item.label !== 'Cerrar sesión'">
+              {{ item.label }}
+            </span>
+
+            @if (item.description) {
+              <span class="text-xs leading-relaxed text-slate-500">
+                {{ item.description }}
+              </span>
+            }
+
+          </span>
+
+          <!-- INDICADOR DE NAVEGACIÓN -->
           @if (item.label !== 'Cerrar sesión') {
-            <i class="pi pi-chevron-right text-[10px] text-slate-400"></i>
+            <i class="pi pi-chevron-right shrink-0 text-[10px] text-slate-400 transition-transform group-hover:translate-x-0.5" aria-hidden="true"></i>
           }
 
         </a>
+
       </ng-template>
 
     </p-menu>
@@ -73,24 +124,28 @@
     <!-- BOTÓN DE PERFIL -->
     @if (usuario(); as user) {
 
-      <button type="button" (click)="menu.toggle($event)" aria-label="Opciones de usuario" aria-haspopup="menu" class="group flex min-w-0 items-center gap-2 rounded-xl border border-transparent px-1.5 py-1.5 text-white transition-all duration-200 hover:border-white/10 hover:bg-white/10 sm:gap-3 sm:px-3">
+      <button type="button" (click)="menu.toggle($event)" aria-label="Opciones de usuario" aria-haspopup="menu" class="group flex min-w-0 items-center gap-2 rounded-lg border border-transparent px-1.5 py-1.5 text-white transition-colors hover:border-white/10 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 sm:gap-3 sm:px-2.5">
 
         <!-- AVATAR -->
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-white/20 bg-sky-100 text-sm font-bold text-[#002d54] shadow-sm">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-white/20 bg-sky-100 text-sm font-semibold text-[#002d54]">
           {{ user.correo.charAt(0).toUpperCase() }}
         </div>
 
         <!-- DATOS DEL USUARIO -->
-        <div class="hidden min-w-0 max-w-48 text-left md:block">
-          <p class="truncate text-sm font-semibold leading-5 text-white">{{ user.correo }}</p>
+        <div class="hidden min-w-0 max-w-44 text-left md:block">
 
-          <div class="mt-0.5 flex items-center gap-1.5">
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-            <span class="truncate text-xs capitalize text-blue-200">{{ user.rol.toLowerCase() }}</span>
-          </div>
+          <p class="truncate text-sm font-medium leading-5 text-white">
+            {{ user.correo }}
+          </p>
+
+          <p class="mt-0.5 truncate text-xs capitalize text-blue-200">
+            {{ user.rol.toLowerCase() }}
+          </p>
+
         </div>
 
-        <i class="bi bi-chevron-down hidden text-xs text-blue-200 transition-transform duration-200 group-hover:translate-y-0.5 sm:block"></i>
+        <!-- INDICADOR DEL MENÚ -->
+        <i class="pi pi-chevron-down hidden text-[10px] text-blue-200 transition-transform duration-200 group-hover:translate-y-0.5 sm:block" aria-hidden="true"></i>
 
       </button>
 

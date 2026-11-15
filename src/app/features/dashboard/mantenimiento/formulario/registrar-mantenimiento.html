@@ -1,0 +1,93 @@
+<section class="mx-auto flex w-full max-w-3xl flex-col gap-7 px-4 py-6 text-slate-800 sm:px-6 lg:py-9">
+
+  <!-- ENCABEZADO -->
+  <div>
+    <a routerLink="/dashboard/historial" class="inline-flex items-center gap-2 text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54]">
+      <i class="pi pi-arrow-left text-xs"></i> Volver al historial
+    </a>
+    <p class="mb-2 mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#0077cc]">Mantenimiento</p>
+    <h1 class="text-3xl font-bold tracking-tight text-[#002d54] sm:text-4xl">Registrar mantenimiento</h1>
+    <p class="mt-3 text-sm leading-6 text-slate-500">Deja constancia del trabajo realizado para atender una falla, su resultado y su costo.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" [attr.aria-busy]="cargando()">
+    <div class="flex items-center gap-4 border-b border-slate-100 px-6 py-5 sm:px-8">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eaf4fc] text-[#0077cc]"><i class="pi pi-wrench text-xl"></i></div>
+      <div>
+        <h2 class="text-lg font-bold text-[#002d54]">Datos del mantenimiento</h2>
+        <p class="mt-1 text-sm text-slate-500">Los campos marcados con * son obligatorios.</p>
+      </div>
+    </div>
+
+    <fieldset [disabled]="guardando() || cargando()" class="grid gap-6 px-6 py-6 sm:grid-cols-2 sm:px-8">
+      <!-- FALLA -->
+      <div class="flex flex-col gap-2 sm:col-span-2">
+        <label for="mant-falla" class="text-sm font-semibold text-slate-700">Falla atendida *</label>
+        <select id="mant-falla" formControlName="idFalla" [attr.aria-invalid]="invalido('idFalla')" class="h-12 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-[#0077cc] focus:outline-none">
+          <option [ngValue]="null" disabled>{{ cargando() ? 'Cargando fallas…' : (fallas().length ? 'Selecciona una falla' : 'No hay fallas sin resolver') }}</option>
+          @for (f of fallas(); track f.idFalla) {
+            <option [ngValue]="f.idFalla">#{{ f.idFalla }} · Cisterna #{{ f.idCisterna }} · {{ f.estado }} · {{ f.descripcion }}</option>
+          }
+        </select>
+        @if (invalido('idFalla')) { <p class="text-xs text-red-700">Selecciona la falla que atendiste.</p> }
+        @if (fallaElegida(); as f) {
+          <p class="rounded-lg bg-[#f4f7fb] px-3 py-2 text-xs text-slate-600">Reportada el {{ f.fechaHora | fecha:true }} en la cisterna #{{ f.idCisterna }}. Estado actual: <strong>{{ f.estado }}</strong>.</p>
+        }
+      </div>
+
+      <!-- FECHA -->
+      <div class="flex flex-col gap-2">
+        <label for="mant-fecha" class="text-sm font-semibold text-slate-700">Fecha del trabajo *</label>
+        <input pInputText id="mant-fecha" type="datetime-local" formControlName="fecha" [max]="maxFecha" [attr.aria-invalid]="invalido('fecha')" class="block! h-12! w-full! rounded-xl! border! border-slate-300! bg-white! px-3! text-sm! text-slate-900! shadow-none! focus:border-[#0077cc]!" />
+        @if (invalido('fecha')) { <p class="text-xs text-red-700">Indica cuándo se realizó el trabajo.</p> }
+      </div>
+
+      <!-- COSTO -->
+      <div class="flex flex-col gap-2">
+        <label for="mant-costo" class="text-sm font-semibold text-slate-700">Costo (S/)</label>
+        <input pInputText id="mant-costo" type="number" min="0" step="0.01" formControlName="costo" placeholder="0.00" [attr.aria-invalid]="invalido('costo')" class="block! h-12! w-full! rounded-xl! border! border-slate-300! bg-white! px-3! text-sm! text-slate-900! shadow-none! focus:border-[#0077cc]!" />
+        @if (invalido('costo')) { <p class="text-xs text-red-700">El costo no puede ser negativo.</p> }
+      </div>
+
+      <!-- TRABAJO REALIZADO -->
+      <div class="flex flex-col gap-2 sm:col-span-2">
+        <label for="mant-descripcion" class="text-sm font-semibold text-slate-700">Trabajo realizado *</label>
+        <textarea id="mant-descripcion" formControlName="descripcion" rows="3" maxlength="250" placeholder="Ej.: cambio de empaquetadura y prueba de hermeticidad" [attr.aria-invalid]="invalido('descripcion')" class="w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-900 focus:border-[#0077cc] focus:outline-none"></textarea>
+        @if (invalido('descripcion')) { <p class="text-xs text-red-700">Describe el trabajo realizado.</p> }
+      </div>
+
+      <!-- RESULTADO -->
+      <div class="flex flex-col gap-2">
+        <label for="mant-resultado" class="text-sm font-semibold text-slate-700">Resultado</label>
+        <textarea id="mant-resultado" formControlName="resultado" rows="3" maxlength="250" placeholder="Ej.: cisterna operativa" class="w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-900 focus:border-[#0077cc] focus:outline-none"></textarea>
+      </div>
+
+      <!-- OBSERVACIONES -->
+      <div class="flex flex-col gap-2">
+        <label for="mant-observaciones" class="text-sm font-semibold text-slate-700">Observaciones</label>
+        <textarea id="mant-observaciones" formControlName="observaciones" rows="3" maxlength="250" placeholder="Repuestos usados, próxima revisión…" class="w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-900 focus:border-[#0077cc] focus:outline-none"></textarea>
+      </div>
+
+      <!-- CERRAR FALLA -->
+      @if (fallaElegida()?.estado === 'EN_REPARACION') {
+        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 sm:col-span-2">
+          <input type="checkbox" formControlName="marcarResuelta" class="mt-0.5 h-4 w-4 accent-emerald-600" />
+          <span><strong>Marcar la falla como RESUELTA</strong> al guardar. Desmárcalo si el trabajo fue parcial y la reparación continúa.</span>
+        </label>
+      } @else if (fallaElegida()?.estado === 'PENDIENTE') {
+        <p class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 sm:col-span-2"><i class="pi pi-info-circle mr-1"></i>Esta falla sigue <strong>PENDIENTE</strong>. Para poder cerrarla, primero pásala a EN_REPARACION desde el listado de fallas.</p>
+      }
+    </fieldset>
+
+    @if (error()) {
+      <p role="alert" class="mx-6 mb-2 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-8"><i class="pi pi-exclamation-circle mt-0.5"></i>{{ error() }}</p>
+    }
+
+    <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-6 py-5 sm:flex-row sm:justify-end sm:px-8">
+      <a routerLink="/dashboard/historial" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancelar</a>
+      <button type="submit" [disabled]="guardando() || cargando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#007ac3] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#0064a3] disabled:cursor-not-allowed disabled:opacity-60">
+        <i class="pi" [class.pi-spin]="guardando()" [class.pi-spinner]="guardando()" [class.pi-save]="!guardando()"></i>{{ guardando() ? 'Guardando…' : 'Registrar mantenimiento' }}
+      </button>
+    </div>
+  </form>
+</section>

@@ -9,6 +9,24 @@ import { ButtonModule } from 'primeng/button';
 import { TrabajadorService } from '../../../../core/services/trabajador/trabajador-service';
 import { RolTrabajador, TrabajadorResponse, TrabajadorRegistro } from '../../../../core/models/TrabajadorModel';
 
+export const CAMPOS_TRABAJADOR = [
+  { key: 'nombres', titulo: 'Nombres', tipo: 'text', max: 100, ayuda: 'Obligatorio, hasta 100 caracteres.' },
+  { key: 'apellidos', titulo: 'Apellidos', tipo: 'text', max: 100, ayuda: 'Obligatorio, hasta 100 caracteres.' },
+  { key: 'dni', titulo: 'DNI', tipo: 'text', max: 8, ayuda: 'Exactamente 8 dígitos.' },
+  { key: 'telefono', titulo: 'Teléfono (opcional)', tipo: 'tel', max: 9, ayuda: 'Fijo de 8 dígitos o celular de 9, sin prefijo.' },
+  { key: 'direccion', titulo: 'Dirección (opcional)', tipo: 'text', max: 150, ayuda: 'Hasta 150 caracteres.' },
+  { key: 'fechaIngreso', titulo: 'Fecha de ingreso', tipo: 'date', max: 10, ayuda: 'Selecciona la fecha de ingreso.' },
+];
+/** Validaciones de los datos personales; Editar trabajador solo cambia estos campos (PUT /trabajadores/{id}). */
+export const VALIDACION_DATOS_TRABAJADOR = {
+  nombres: [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)],
+  apellidos: [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)],
+  dni: [Validators.required, Validators.pattern(/^\d{8}$/)],
+  telefono: [Validators.pattern(/^(?:[1-8]\d{7}|9\d{8})?$/)],
+  direccion: [Validators.maxLength(150)],
+  fechaIngreso: [Validators.required],
+};
+
 @Component({ selector: 'app-formulario-trabajador', imports: [CommonModule, ReactiveFormsModule, InputTextModule, ButtonModule], templateUrl: './formulario-trabajador.html' })
 export class FormularioTrabajador {
   private readonly service = inject(TrabajadorService);
@@ -24,14 +42,9 @@ export class FormularioTrabajador {
   readonly errorFormulario = signal('');
   readonly roles: RolTrabajador[] = ['ADMIN', 'ANALISTA', 'PROGRAMADOR', 'CONDUCTOR', 'TECNICO'];
   readonly rolFormulario = signal<RolTrabajador>('ANALISTA');
-  readonly campos = [
-    { key: 'nombres', titulo: 'Nombres', tipo: 'text', max: 100, ayuda: 'Obligatorio, hasta 100 caracteres.' },
-    { key: 'apellidos', titulo: 'Apellidos', tipo: 'text', max: 100, ayuda: 'Obligatorio, hasta 100 caracteres.' },
-    { key: 'dni', titulo: 'DNI', tipo: 'text', max: 8, ayuda: 'Exactamente 8 dígitos.' },
-    { key: 'telefono', titulo: 'Teléfono (opcional)', tipo: 'tel', max: 9, ayuda: 'Fijo de 8 dígitos o celular de 9, sin prefijo.' },
-    { key: 'direccion', titulo: 'Dirección (opcional)', tipo: 'text', max: 150, ayuda: 'Hasta 150 caracteres.' },
-    { key: 'fechaIngreso', titulo: 'Fecha de ingreso', tipo: 'date', max: 10, ayuda: 'Selecciona la fecha de ingreso.' },
-  ];
+  /** Datos personales (los mismos en Crear y Editar trabajador). */
+  readonly campos = CAMPOS_TRABAJADOR;
+
   readonly extra: { key: string; titulo: string; tipo?: string; opciones?: string[]; roles: RolTrabajador[] }[] = [
     { key: 'licenciaConducir', titulo: 'Licencia de conducir', roles: ['CONDUCTOR'] },
     { key: 'categoriaLicencia', titulo: 'Categoría de licencia', opciones: ['A_I', 'A_IIA', 'A_IIB', 'A_IIIA', 'A_IIIB', 'A_IIIC'], roles: ['CONDUCTOR'] },

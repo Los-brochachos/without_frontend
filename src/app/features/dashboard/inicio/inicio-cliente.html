@@ -151,8 +151,45 @@
         </a>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full min-w-190 text-left text-sm">
+      <!-- CELULAR / TABLET / LAPTOP PEQUEÑA: tarjetas (la tabla no cabe sin scroll horizontal) -->
+      <div class="xl:hidden">
+        @if (recientes().length) {
+          <ul class="grid gap-3 p-4 sm:grid-cols-2 sm:p-6" aria-label="Pedidos recientes">
+            @for (p of recientes(); track p.idPedido) {
+              <li>
+                <a [routerLink]="['/cliente/pedidos', p.idPedido]" class="group flex h-full flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-sky-200 hover:bg-sky-50/40">
+                  <div class="flex flex-wrap items-start justify-between gap-2">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-[#0077cc]"><i class="pi pi-box" aria-hidden="true"></i></div>
+                      <span class="whitespace-nowrap text-base font-bold text-[#002d54]">Pedido #{{ p.idPedido }}</span>
+                    </div>
+                    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
+                      [class]="p.estado === 'ENTREGADO' ? 'bg-emerald-50 text-emerald-700' : p.estado === 'CANCELADO' ? 'bg-red-50 text-red-700' : p.estado === 'RECIBIDO' ? 'bg-sky-50 text-sky-700' : 'bg-amber-50 text-amber-700'">
+                      <i class="pi pi-circle-fill text-[6px]" aria-hidden="true"></i>{{ p.estado }}
+                    </span>
+                  </div>
+                  <dl class="grid grid-cols-2 gap-3 rounded-lg bg-[#f4f7fb] p-3 text-xs">
+                    <div><dt class="text-slate-500">Registro</dt><dd class="mt-0.5 font-semibold text-slate-700">{{ p.fechaRegistro ? (p.fechaRegistro | date:preferencias.formato()) : 'Sin fecha' }}</dd></div>
+                    <div><dt class="text-slate-500">Entrega estimada</dt><dd class="mt-0.5 font-semibold text-slate-700">{{ p.fechaEntregaEstimada ? (p.fechaEntregaEstimada | date:preferencias.formato()) : 'Por confirmar' }}</dd></div>
+                  </dl>
+                  <span class="mt-auto inline-flex items-center gap-2 text-xs font-bold text-[#0077cc] group-hover:underline">Ver detalle <i class="pi pi-arrow-right text-xs" aria-hidden="true"></i></span>
+                </a>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="px-6 py-14 text-center">
+            <i class="pi pi-inbox mb-4 block text-4xl text-slate-300"></i>
+            <p class="font-semibold text-slate-700">Todavía no tienes pedidos</p>
+            <p class="mt-2 text-sm text-slate-500">Crea tu primera solicitud para comenzar.</p>
+            <a routerLink="/cliente/pedidos/nuevo" class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] hover:underline"><i class="pi pi-plus"></i> Crear pedido</a>
+          </div>
+        }
+      </div>
+
+      <!-- ESCRITORIO (≥ 1280 px): tabla -->
+      <div class="hidden overflow-x-auto xl:block">
+        <table class="w-full text-left text-sm">
           <thead class="bg-[#f4f7fb] text-xs font-bold uppercase tracking-wider text-slate-500">
             <tr>
               <th scope="col" class="px-6 py-4 sm:pl-8">Pedido</th>

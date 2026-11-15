@@ -1,4 +1,5 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { TraducirPipe } from '../../../core/i18n/idioma';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -7,7 +8,7 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { ButtonModule } from 'primeng/button';
 import { ClienteService } from '../../../core/services/cliente/cliente-service';
 
-@Component({ selector: 'app-register', imports: [ReactiveFormsModule, RouterLink, InputTextModule, InputMaskModule, ButtonModule], templateUrl: './register.html' })
+@Component({ selector: 'app-register', imports: [TraducirPipe, ReactiveFormsModule, RouterLink, InputTextModule, InputMaskModule, ButtonModule], templateUrl: './register.html' })
 export class Register {
   private readonly clientes = inject(ClienteService);
   private readonly destroyRef = inject(DestroyRef);

@@ -6,7 +6,7 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Observable, Subject, catchError, combineLatest, concat, forkJoin, map, of, startWith, switchMap, tap, toArray } from 'rxjs';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { SelectorEdicion } from '../../compartido/edicion/selector-edicion';
 import { PedidoService } from '../../../../core/services/pedido/pedido-service';
 import { ProductoService } from '../../../../core/services/pedido/producto-service';
 import { DetallePedidoService } from '../../../../core/services/pedido/detalle-pedido-service';
@@ -30,7 +30,7 @@ interface OpcionPedido { id: number; etiqueta: string }
  * Mismo formulario que «Crear pedido», con un selector (con búsqueda por ID) arriba.
  * Solo se pueden editar pedidos en estado RECIBIDO (regla del backend).
  */
-@Component({ selector: 'app-editar-pedido', imports: [RouterLink, DecimalPipe, ReactiveFormsModule, InputTextModule, SelectModule], templateUrl: './editar-pedido.html' })
+@Component({ selector: 'app-editar-pedido', imports: [RouterLink, DecimalPipe, ReactiveFormsModule, InputTextModule, SelectorEdicion], templateUrl: './editar-pedido.html' })
 export class EditarPedido {
   private readonly pedidosApi = inject(PedidoService);
   private readonly catalogo = inject(ProductoService);

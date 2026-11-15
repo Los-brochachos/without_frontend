@@ -1,0 +1,108 @@
+<section class="mx-auto flex w-full max-w-7xl flex-col gap-7 px-4 py-6 text-slate-800 sm:px-6 lg:py-9">
+
+  <!-- ENCABEZADO -->
+  <div class="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+    <div class="min-w-0">
+      <a [routerLink]="volver" class="inline-flex items-center gap-2 text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54]">
+        <i class="pi pi-arrow-left text-xs"></i> Volver al inicio
+      </a>
+      <p class="mb-2 mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#0077cc]">Operaciones</p>
+      <h1 class="text-3xl font-bold tracking-tight text-[#002d54] sm:text-4xl">Atenciones</h1>
+      <p class="mt-3 text-sm leading-6 text-slate-500">Entregas programadas con su conductor, cisterna y horario.</p>
+    </div>
+    <button type="button" (click)="actualizar()" [disabled]="cargando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-[#002d54] shadow-sm transition-colors hover:border-sky-200 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-50">
+      <i class="pi pi-refresh" [class.pi-spin]="cargando()"></i> {{ cargando() ? 'Actualizando…' : 'Actualizar listado' }}
+    </button>
+  </div>
+
+  <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" [attr.aria-busy]="cargando()">
+
+    <!-- FILTROS -->
+    <div class="border-b border-slate-100 px-6 py-6 sm:px-8">
+      <div class="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+        <div class="flex items-center gap-4">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eaf4fc] text-[#0077cc]"><i class="pi pi-calendar text-xl"></i></div>
+          <div>
+            <h2 class="text-lg font-bold text-[#002d54]">Listado de atenciones</h2>
+            <p class="mt-1 text-sm text-slate-500">Consulta de solo lectura.</p>
+          </div>
+        </div>
+        <span class="flex w-fit items-center gap-2 rounded-full bg-sky-50 px-4 py-2 text-xs font-bold text-[#0077cc]"><i class="pi pi-database"></i> {{ total() }} atenciones</span>
+      </div>
+
+      <div class="mt-7 grid gap-4 md:grid-cols-[1fr_16rem]">
+        <div class="flex flex-col gap-2">
+          <label for="buscar-atenciones" class="text-sm font-semibold text-slate-700">Buscar</label>
+          <div class="relative">
+            <i class="pi pi-search pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-sm text-slate-400"></i>
+            <input pInputText id="buscar-atenciones" type="search" [value]="consulta()" (input)="buscar($any($event.target).value)" placeholder="N.º de atención o pedido, cliente, conductor o cisterna" class="h-12! w-full! rounded-xl! border! border-slate-300! bg-white! py-3! pl-11! pr-4! text-sm! text-slate-800! shadow-none! focus:border-[#0077cc]!" />
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="estado-atenciones" class="text-sm font-semibold text-slate-700">Estado</label>
+          <select id="estado-atenciones" [value]="estado()" (change)="filtrarEstado($any($event.target).value)" class="h-12 rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-[#0077cc] focus:outline-none">
+            <option value="" [selected]="!estado()">Todos los estados</option>
+            @for (e of estados; track e) { <option [value]="e" [selected]="estado() === e">{{ texto(e) }}</option> }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    @if (cargando()) {
+      <div role="status" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+        <i class="pi pi-spin pi-spinner mb-5 text-4xl text-[#0077cc]"></i>
+        <h3 class="text-lg font-bold text-[#002d54]">Cargando atenciones</h3>
+      </div>
+    } @else if (error()) {
+      <div role="alert" class="flex flex-col items-center px-6 py-14 text-center">
+        <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600"><i class="pi pi-exclamation-triangle text-2xl"></i></div>
+        <h3 class="text-lg font-bold text-slate-900">No se pudieron cargar las atenciones</h3>
+        <p class="mt-3 max-w-md text-sm leading-6 text-red-700">{{ error() }}</p>
+        <button type="button" (click)="actualizar()" class="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#002d54] px-5 py-3 text-sm font-semibold text-white hover:bg-[#004477]"><i class="pi pi-refresh"></i> Reintentar</button>
+      </div>
+    } @else if (!filas().length) {
+      <div role="status" class="flex flex-col items-center px-6 py-16 text-center">
+        <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50 text-slate-400"><i class="pi pi-inbox text-3xl"></i></div>
+        <h3 class="text-lg font-bold text-[#002d54]">No hay atenciones</h3>
+        <p class="mt-2 text-sm text-slate-500">Todavía no se ha programado ninguna atención.</p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-225 text-left text-sm">
+          <caption class="sr-only">Atenciones</caption>
+          <thead class="bg-[#f4f7fb] text-xs font-bold uppercase tracking-wider text-slate-500">
+            <tr>
+              <th scope="col" class="px-6 py-4 pl-8">Atención</th>
+              <th scope="col" class="px-6 py-4">Pedido / cliente</th>
+              <th scope="col" class="px-6 py-4">Conductor</th>
+              <th scope="col" class="px-6 py-4">Cisterna</th>
+              <th scope="col" class="px-6 py-4">Horario programado</th>
+              <th scope="col" class="px-6 py-4 pr-8">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (a of visibles(); track a.idAtencion) {
+              <tr class="transition-colors hover:bg-slate-50/80">
+                <td class="px-6 py-5 pl-8 font-bold text-[#002d54]">#{{ a.idAtencion }}</td>
+                <td class="px-6 py-5">
+                  <span class="block font-semibold text-slate-700">Pedido #{{ a.idPedido }}</span>
+                  <span class="block text-xs text-slate-500">{{ a.razonSocial || '—' }}</span>
+                </td>
+                <td class="px-6 py-5 text-slate-700">{{ a.nombreConductor || '—' }}</td>
+                <td class="px-6 py-5 text-slate-700">{{ a.cisterna || '—' }}</td>
+                <td class="whitespace-nowrap px-6 py-5 text-slate-600">
+                  <span class="block">{{ (a.fechaInicioProgramada | fecha:true) ?? '—' }}</span>
+                  <span class="block text-xs text-slate-400">hasta {{ (a.fechaFinProgramada | fecha:true) ?? '—' }}</span>
+                </td>
+                <td class="px-6 py-5 pr-8"><span class="rounded-full px-3 py-1 text-xs font-bold" [class]="claseEstado(a.estado)">{{ texto(a.estado) }}</span></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500">Ninguna atención coincide con los filtros.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-paginacion [pagina]="pagina()" [paginas]="paginas()" [total]="total()" (cambiar)="cambiarPagina($event)" />
+    }
+  </article>
+</section>

@@ -1,0 +1,155 @@
+<section class="mx-auto flex w-full max-w-7xl flex-col gap-7 px-4 py-6 text-slate-800 sm:px-6 lg:py-9">
+
+  <!-- ENCABEZADO -->
+  <div class="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+    <div class="min-w-0">
+      <a [routerLink]="volver" class="inline-flex items-center gap-2 text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54]">
+        <i class="pi pi-arrow-left text-xs"></i> Volver al inicio
+      </a>
+      <p class="mb-2 mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#0077cc]">Seguridad</p>
+      <h1 class="text-3xl font-bold tracking-tight text-[#002d54] sm:text-4xl">Usuarios</h1>
+      <p class="mt-3 text-sm leading-6 text-slate-500">Cuentas de acceso al sistema con su rol y estado.</p>
+    </div>
+    <button type="button" (click)="actualizar()" [disabled]="cargando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-[#002d54] shadow-sm transition-colors hover:border-sky-200 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-50">
+      <i class="pi pi-refresh" [class.pi-spin]="cargando()"></i> {{ cargando() ? 'Actualizando…' : 'Actualizar listado' }}
+    </button>
+  </div>
+
+  @if (aviso()) {
+    <p role="status" class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+      <i class="pi pi-check-circle mt-0.5"></i><span class="flex-1">{{ aviso() }}</span>
+      <button type="button" (click)="aviso.set('')" aria-label="Cerrar aviso" class="text-emerald-700 hover:text-emerald-900"><i class="pi pi-times text-xs"></i></button>
+    </p>
+  }
+
+  <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" [attr.aria-busy]="cargando()">
+
+    <!-- FILTROS -->
+    <div class="border-b border-slate-100 px-6 py-6 sm:px-8">
+      <div class="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+        <div class="flex items-center gap-4">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eaf4fc] text-[#0077cc]"><i class="pi pi-id-card text-xl"></i></div>
+          <div>
+            <h2 class="text-lg font-bold text-[#002d54]">Listado de usuarios</h2>
+            <p class="mt-1 text-sm text-slate-500">10 registros por página.</p>
+          </div>
+        </div>
+        <span class="flex w-fit items-center gap-2 rounded-full bg-sky-50 px-4 py-2 text-xs font-bold text-[#0077cc]"><i class="pi pi-database"></i> {{ total() }} usuarios</span>
+      </div>
+
+      <div class="mt-7 grid gap-4 md:grid-cols-[1fr_12rem_12rem]">
+        <div class="flex flex-col gap-2">
+          <label for="buscar-usuarios" class="text-sm font-semibold text-slate-700">Buscar</label>
+          <div class="relative">
+            <i class="pi pi-search pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-sm text-slate-400"></i>
+            <input pInputText id="buscar-usuarios" type="search" [value]="consulta()" (input)="buscar($any($event.target).value)" placeholder="Correo o N.º de usuario" class="h-12! w-full! rounded-xl! border! border-slate-300! bg-white! py-3! pl-11! pr-4! text-sm! text-slate-800! shadow-none! focus:border-[#0077cc]!" />
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="rol-usuarios" class="text-sm font-semibold text-slate-700">Rol</label>
+          <select id="rol-usuarios" [value]="rol()" (change)="filtrarRol($any($event.target).value)" class="h-12 rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-[#0077cc] focus:outline-none">
+            <option value="" [selected]="!rol()">Todos los roles</option>
+            @for (r of roles; track r) { <option [value]="r" [selected]="rol() === r">{{ r }}</option> }
+          </select>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="estado-usuarios" class="text-sm font-semibold text-slate-700">Estado</label>
+          <select id="estado-usuarios" [value]="estado()" (change)="filtrarEstado($any($event.target).value)" class="h-12 rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-[#0077cc] focus:outline-none">
+            <option value="" [selected]="!estado()">Todos</option>
+            @for (e of estados; track e) { <option [value]="e" [selected]="estado() === e">{{ texto(e) }}</option> }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    @if (cargando()) {
+      <div role="status" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+        <i class="pi pi-spin pi-spinner mb-5 text-4xl text-[#0077cc]"></i>
+        <h3 class="text-lg font-bold text-[#002d54]">Cargando usuarios</h3>
+      </div>
+    } @else if (error()) {
+      <div role="alert" class="flex flex-col items-center px-6 py-14 text-center">
+        <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600"><i class="pi pi-exclamation-triangle text-2xl"></i></div>
+        <h3 class="text-lg font-bold text-slate-900">No se pudieron cargar los usuarios</h3>
+        <p class="mt-3 max-w-md text-sm leading-6 text-red-700">{{ error() }}</p>
+        <button type="button" (click)="actualizar()" class="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#002d54] px-5 py-3 text-sm font-semibold text-white hover:bg-[#004477]"><i class="pi pi-refresh"></i> Reintentar</button>
+      </div>
+    } @else if (!filas().length) {
+      <div role="status" class="flex flex-col items-center px-6 py-16 text-center">
+        <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50 text-slate-400"><i class="pi pi-inbox text-3xl"></i></div>
+        <h3 class="text-lg font-bold text-[#002d54]">No hay usuarios registrados</h3>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-150 text-left text-sm">
+          <caption class="sr-only">Usuarios</caption>
+          <thead class="bg-[#f4f7fb] text-xs font-bold uppercase tracking-wider text-slate-500">
+            <tr>
+              <th scope="col" class="px-6 py-4 pl-8">Usuario</th>
+              <th scope="col" class="px-6 py-4">Correo</th>
+              <th scope="col" class="px-6 py-4">Rol</th>
+              <th scope="col" class="px-6 py-4" [class.pr-8]="!puedeGestionar">Estado</th>
+              @if (puedeGestionar) { <th scope="col" class="px-6 py-4 pr-8 text-right">Acciones</th> }
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (u of visibles(); track u.idUsuario) {
+              <tr class="transition-colors hover:bg-slate-50/80">
+                <td class="px-6 py-5 pl-8 font-bold text-[#002d54]">#{{ u.idUsuario }}</td>
+                <td class="px-6 py-5 text-slate-700"><i class="pi pi-envelope mr-2 text-slate-400"></i>{{ u.correo }}</td>
+                <td class="px-6 py-5"><span class="rounded-full px-3 py-1 text-xs font-bold" [class]="claseRol(u.rol)">{{ u.rol }}</span></td>
+                <td class="px-6 py-5" [class.pr-8]="!puedeGestionar"><span class="rounded-full px-3 py-1 text-xs font-bold" [class]="claseEstado(u.estado)">{{ texto(u.estado) }}</span></td>
+                @if (puedeGestionar) {
+                  <td class="px-6 py-5 pr-8 text-right">
+                    @if (u.rol === 'SUPERADMIN' || u.correo === correoPropio) {
+                      <span class="text-xs text-slate-400" [title]="u.rol === 'SUPERADMIN' ? 'Cuenta protegida' : 'Tu propia cuenta'"><i class="pi pi-lock mr-1 text-[10px]"></i>Protegida</span>
+                    } @else {
+                      <div class="flex flex-wrap justify-end gap-2">
+                        @if (u.estado === 'ACTIVO') {
+                          <button type="button" (click)="cambiarEstado(u)" [disabled]="procesando() !== null" class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-50 disabled:opacity-50"><i class="pi text-xs" [class.pi-ban]="procesando() !== u.idUsuario" [class.pi-spinner]="procesando() === u.idUsuario" [class.pi-spin]="procesando() === u.idUsuario"></i> Desactivar</button>
+                        } @else {
+                          <button type="button" (click)="cambiarEstado(u)" [disabled]="procesando() !== null" class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-emerald-300 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50"><i class="pi text-xs" [class.pi-replay]="procesando() !== u.idUsuario" [class.pi-spinner]="procesando() === u.idUsuario" [class.pi-spin]="procesando() === u.idUsuario"></i> Activar</button>
+                        }
+                        @if (esSuperadmin) {
+                          <button type="button" (click)="abrirCambioCorreo(u)" title="Cambio de correo de emergencia" class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-amber-300 px-3 py-2 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-50"><i class="pi pi-envelope text-xs"></i> Cambiar correo</button>
+                        }
+                      </div>
+                    }
+                  </td>
+                }
+              </tr>
+            } @empty {
+              <tr><td [attr.colspan]="puedeGestionar ? 5 : 4" class="px-6 py-10 text-center text-sm text-slate-500">Ningún usuario coincide con los filtros.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-paginacion [pagina]="pagina()" [paginas]="paginas()" [total]="total()" (cambiar)="cambiarPagina($event)" />
+    }
+  </article>
+
+  <!-- CAMBIO DE CORREO DE EMERGENCIA (solo SUPERADMIN, PATCH /usuarios/{id}) -->
+  <p-dialog [visible]="!!editandoCorreo()" (visibleChange)="!$event && cerrarCambioCorreo()" [modal]="true" [draggable]="false" [resizable]="false"
+    [closeOnEscape]="!guardandoCorreo()" [closable]="!guardandoCorreo()" header="Cambio de correo de emergencia" [style]="{ width: '30rem', maxWidth: 'calc(100vw - 2rem)' }">
+    @if (editandoCorreo(); as u) {
+      <form (submit)="$event.preventDefault(); guardarCorreo()" class="flex flex-col gap-4">
+        <p class="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
+          <i class="pi pi-exclamation-triangle mt-0.5"></i>
+          <span>Usa esto solo si la persona perdió el acceso a su correo. Se <strong>cerrarán sus sesiones abiertas</strong> y deberá ingresar con el correo nuevo (su contraseña no cambia).</span>
+        </p>
+        <p class="text-sm text-slate-600">Cuenta <strong>#{{ u.idUsuario }}</strong> · {{ u.rol }}<br>Correo actual: <strong class="break-all">{{ u.correo }}</strong></p>
+        <div>
+          <label for="correo-emergencia" class="mb-2 block text-sm font-medium text-slate-700">Nuevo correo</label>
+          <input pInputText id="correo-emergencia" type="email" name="correo" maxlength="100" [value]="nuevoCorreo()" (input)="nuevoCorreo.set($any($event.target).value)" placeholder="nombre@empresa.com" class="h-11! w-full! rounded-lg!" autocomplete="off" />
+        </div>
+        @if (errorCorreo()) { <p role="alert" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ errorCorreo() }}</p> }
+        <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button type="button" (click)="cerrarCambioCorreo()" [disabled]="guardandoCorreo()" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancelar</button>
+          <button type="submit" [disabled]="guardandoCorreo()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-amber-600 px-5 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-60">
+            <i class="pi" [class.pi-spin]="guardandoCorreo()" [class.pi-spinner]="guardandoCorreo()" [class.pi-check]="!guardandoCorreo()"></i>{{ guardandoCorreo() ? 'Guardando…' : 'Cambiar correo' }}
+          </button>
+        </div>
+      </form>
+    }
+  </p-dialog>
+</section>

@@ -39,6 +39,7 @@ export class VistaRol {
       ? import('../inicio/inicio-programador').then(m => m.InicioProgramador)
       : import('../inicio/resumen').then(m => m.Dashboard);
     const pantalla = seccionDe(rol, vista)?.pantalla;
-    return pantalla ? pantalla() : import('../compartido/listado/listado').then(m => m.Listado);
+    if (!pantalla) throw new Error(`El rol ${rol} no tiene la sección ${vista}`);
+    return pantalla();
   }
 }

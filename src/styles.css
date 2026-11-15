@@ -96,7 +96,13 @@ input:disabled {
 /* Superficies */
 .app-oscuro .bg-white { background-color: var(--oscuro-tarjeta); }
 .app-oscuro .hover\:bg-white:hover { background-color: var(--oscuro-suave); }
-.app-oscuro .bg-\[\#f4f7fb\] { background-color: var(--oscuro-fondo); }
+.app-oscuro .bg-\[\#f4f7fb\],
+.app-oscuro .bg-\[\#edf2f8\],
+.app-oscuro .bg-\[\#f3f6fa\] { background-color: var(--oscuro-fondo); }
+/* Manchas de luz decorativas del fondo (login, registro): más tenues en oscuro */
+.app-oscuro .bg-sky-200\/40,
+.app-oscuro .bg-blue-200\/40 { background-color: rgb(14 116 194 / 0.12); }
+.app-oscuro .bg-\[\#edf3f9\],
 .app-oscuro .bg-\[\#eaf4fc\],
 .app-oscuro .bg-\[\#f5f8fc\],
 .app-oscuro .bg-\[\#f8fafd\],
@@ -118,7 +124,9 @@ input:disabled {
 .app-oscuro .text-\[\#005491\],
 .app-oscuro .text-\[\#005b9f\],
 .app-oscuro .text-\[\#0c4d85\],
-.app-oscuro .text-sky-700 { color: var(--oscuro-enlace); }
+.app-oscuro .text-sky-700,
+.app-oscuro .text-blue-600,
+.app-oscuro .text-blue-700 { color: var(--oscuro-enlace); }
 .app-oscuro .text-sky-800 { color: #9fd3f7; }
 .app-oscuro .text-sky-900 { color: #c3e4fb; }
 .app-oscuro .text-emerald-600,
@@ -198,3 +206,186 @@ input:disabled {
 .app-oscuro .from-white { --tw-gradient-from: var(--oscuro-suave); }
 .app-oscuro .to-sky-50,
 .app-oscuro .to-white { --tw-gradient-to: var(--oscuro-tarjeta); }
+
+/* ==========================================================================
+   TRANSICIÓN CLARO ↔ OSCURO (la activa PortalPreferencias al cambiar el tema)
+   ========================================================================== */
+/* Navegadores con View Transitions: fundido suave de toda la pantalla. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 450ms;
+  animation-timing-function: ease-in-out;
+}
+/* Respaldo para el resto de navegadores: anima colores solo mientras dura el cambio. */
+html.tema-cambiando,
+html.tema-cambiando *,
+html.tema-cambiando *::before,
+html.tema-cambiando *::after {
+  transition: background-color 450ms ease-in-out, color 450ms ease-in-out,
+              border-color 450ms ease-in-out, fill 450ms ease-in-out !important;
+}
+
+/* ==========================================================================
+   MODO OSCURO: estructura del dashboard (header, menú lateral y menú de usuario)
+   Tienen colores propios (no de Tailwind claro), por eso se cubren aparte.
+   ========================================================================== */
+.app-oscuro {
+  --oscuro-barra: #0a1424;        /* header */
+  --oscuro-lateral: #0d1a2e;      /* menú lateral */
+  --oscuro-lateral-activo: #16294a;
+  --oscuro-lateral-hover: #13233d;
+}
+/* Header superior */
+.app-oscuro app-header > header { background-color: var(--oscuro-barra); border-color: #1c2b44; }
+
+/* Menú lateral */
+.app-oscuro app-sidebar aside { background-color: var(--oscuro-lateral); }
+.app-oscuro app-sidebar .bg-\[\#003255\] { background-color: var(--oscuro-barra); }
+.app-oscuro app-sidebar .border-white\/10,
+.app-oscuro app-sidebar .border-white\/15 { border-color: #1c2b44; }
+.app-oscuro .without-sidebar-link.without-sidebar-active,
+.app-oscuro .without-sidebar-subitem.without-sidebar-active { background: var(--oscuro-lateral-activo) !important; }
+.app-oscuro .without-sidebar-link:not(.without-sidebar-active):hover { background: var(--oscuro-lateral-hover) !important; }
+/* Tarjeta del usuario del menú lateral: el icono conserva su contraste */
+.app-oscuro app-sidebar .bg-white { background-color: var(--oscuro-lateral-activo); }
+.app-oscuro app-sidebar .text-\[\#002d54\] { color: #e6eefb; }
+
+/* Menú desplegable del usuario (se abre fuera del header, en <body>) */
+.app-oscuro .without-user-menu {
+  background: var(--oscuro-tarjeta) !important;
+  color: #dde4ee !important;
+  border-color: #22324d !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45) !important;
+}
+.app-oscuro .without-user-menu .p-menu-item-content:hover,
+.app-oscuro .without-user-menu .p-menu-item.p-focus > .p-menu-item-content { background: var(--oscuro-suave) !important; }
+.app-oscuro .without-user-menu .p-menu-separator { border-color: #22324d !important; }
+.app-oscuro .without-user-menu .without-menu-link,
+.app-oscuro .without-user-menu .p-menu-item-label,
+.app-oscuro .without-user-menu .p-menu-item-icon { color: #dde4ee !important; }
+
+/* Fondo detrás del menú lateral en móvil */
+.app-oscuro .bg-slate-950\/55 { background-color: rgba(0, 0, 0, 0.65); }
+
+/* =====================================================================
+   SELECTORES (<select>) CON DISEÑO PROPIO — se aplica a todos a la vez
+   Usa `appearance: base-select` (Chrome/Edge 135+): permite diseñar la
+   lista desplegable. Los navegadores sin soporte muestran el select
+   clásico y siguen funcionando igual (mejora progresiva).
+   ===================================================================== */
+@supports (appearance: base-select) {
+  select,
+  ::picker(select) { appearance: base-select; }
+
+  select {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  /* Flecha: chevron que gira al abrir */
+  select::picker-icon {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    margin-left: auto;
+    flex-shrink: 0;
+    background-color: #64748b;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: rotate 0.2s ease;
+  }
+  select:open::picker-icon { rotate: 180deg; }
+
+  /* Panel desplegable: tarjeta con sombra, esquinas redondeadas y animación */
+  ::picker(select) {
+    margin-block: 6px;
+    padding: 6px;
+    max-height: 18rem;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.18), 0 4px 8px -4px rgba(15, 23, 42, 0.08);
+    opacity: 0;
+    translate: 0 -4px;
+    transition: opacity 0.15s ease, translate 0.15s ease, display 0.15s allow-discrete, overlay 0.15s allow-discrete;
+  }
+  select:open::picker(select) { opacity: 1; translate: 0 0; }
+  @starting-style {
+    select:open::picker(select) { opacity: 0; translate: 0 -4px; }
+  }
+
+  /* Opciones */
+  option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #334155;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+  }
+  option:hover,
+  option:focus-visible { background: #f0f7fd; color: #002d54; outline: none; }
+  option:checked { background: #e6f1fb; color: #0077cc; font-weight: 600; }
+  option:disabled { color: #94a3b8; background: transparent; cursor: default; }
+  /* Marca de la opción elegida, a la derecha */
+  option::checkmark { order: 1; margin-left: auto; color: #0077cc; }
+
+  /* Modo oscuro */
+  .app-oscuro ::picker(select) {
+    background: var(--oscuro-tarjeta);
+    border-color: var(--oscuro-borde);
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+  }
+  .app-oscuro select::picker-icon { background-color: #8fa3bf; }
+  .app-oscuro option { color: #dde4ee; }
+  .app-oscuro option:hover,
+  .app-oscuro option:focus-visible { background: var(--oscuro-suave); color: #ffffff; }
+  .app-oscuro option:checked { background: #16294a; color: var(--oscuro-enlace); }
+  .app-oscuro option:disabled { color: #5d6f88; background: transparent; }
+  .app-oscuro option::checkmark { color: var(--oscuro-enlace); }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::picker(select), select::picker-icon { transition: none; }
+  }
+}
+
+/* =====================================================================
+   BUSCADOR DEL NAVBAR: aparece deslizándose y se desvanece al cerrar
+   (clases aplicadas por animate.enter / animate.leave de Angular)
+   ===================================================================== */
+@keyframes buscador-entrar {
+  from { opacity: 0; transform: translateY(-10px); clip-path: inset(0 0 100% 0); }
+  to   { opacity: 1; transform: translateY(0);     clip-path: inset(0 0 0 0); }
+}
+@keyframes buscador-salir {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes buscador-contenido {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.buscador-entra { animation: buscador-entrar 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+/* El formulario entra un instante después del panel: sensación más fluida */
+.buscador-entra form { animation: buscador-contenido 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.06s backwards; }
+.buscador-sale { animation: buscador-salir 0.18s ease-in forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .buscador-entra, .buscador-entra form, .buscador-sale { animation: none; }
+}
+
+/* Resultados del buscador: entran con un fundido suave al escribir */
+.buscador-resultados { animation: buscador-contenido 0.2s ease-out; }
+/* Texto encontrado: al llegar a la sección se ilumina un instante */
+@keyframes resaltar-busqueda {
+  0%, 35% { background-color: rgb(253 230 138 / 0.85); box-shadow: 0 0 0 6px rgb(253 230 138 / 0.85); }
+  100% { background-color: transparent; box-shadow: 0 0 0 6px transparent; }
+}
+.resaltado-busqueda { border-radius: 4px; animation: resaltar-busqueda 2.5s ease-out; }
+.app-oscuro mark { background-color: rgb(250 204 21 / 0.25); color: #fff7d6; }
+@media (prefers-reduced-motion: reduce) { .buscador-resultados { animation: none; } }

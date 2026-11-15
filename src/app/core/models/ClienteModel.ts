@@ -17,6 +17,9 @@ export interface ClienteResponse {
   rol: string; // Corresponde a RolesEnum
   fechaCreacion: string;
   fechaActualizacion: string;
+  /** Cuenta de acceso del cliente (para reactivarla desde Usuarios). */
+  idUsuario: number;
+  estado: 'ACTIVO' | 'INACTIVO';
 }
 
 export interface ClienteUpdateRequest {

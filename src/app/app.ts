@@ -4,10 +4,12 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { PortalPreferencias } from './core/services/portal-preferencias';
+import { AlertaModal } from './core/ui/alerta-modal/alerta-modal';
+import { SesionInactividad } from './core/auth/sesion-inactividad';
 
 
 @Component({
-  imports: [RouterOutlet,ButtonModule],
+  imports: [RouterOutlet, ButtonModule, AlertaModal],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
@@ -18,6 +20,8 @@ export class App {
   constructor() {
     // Se crea al iniciar la app para aplicar el tema (claro/oscuro) y el formato de fecha de la cuenta en todas las pantallas.
     inject(PortalPreferencias);
+    // Renueva el token mientras el usuario trabaja y cierra la sesión si queda inactiva (con aviso en el modal de alertas).
+    inject(SesionInactividad);
 
     // Al entrar a otra pantalla la vista vuelve arriba. Solo cuenta el cambio de ruta:
     // cambiar ?q=, ?pagina= o ?estado= (búsqueda, filtros) no mueve el scroll.

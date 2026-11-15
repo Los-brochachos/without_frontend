@@ -1,57 +1,510 @@
-<section class="mx-auto max-w-3xl space-y-6 text-slate-900">
-  <a [routerLink]="inicio()" class="text-sm text-sky-700">Volver al inicio</a>
-  @if (error()) { <p role="alert" class="rounded-lg bg-red-50 p-4 text-red-700">{{ error() }}</p> }
-  @if (mensaje()) { <p role="status" class="rounded-lg bg-green-50 p-4 text-green-800">{{ mensaje() }}</p> }
+
+<section class="mx-auto flex w-full max-w-6xl min-w-0 flex-col gap-6 px-4 py-6 text-slate-800 sm:px-6 lg:py-8">
+
+  <!-- VOLVER AL INICIO -->
+  <div>
+    <a [routerLink]="inicio()" class="inline-flex items-center gap-2 rounded text-sm font-medium text-[#0077cc] transition-colors hover:text-[#002d54] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0077cc]">
+      <i class="pi pi-arrow-left text-xs" aria-hidden="true"></i>
+      Volver al inicio
+    </a>
+  </div>
+
+  <!-- MENSAJES DE ERROR -->
+  @if (error()) {
+    <div role="alert" class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+      <i class="pi pi-exclamation-circle mt-0.5 shrink-0" aria-hidden="true"></i>
+
+      <div class="min-w-0">
+        <p class="text-sm font-semibold">No se pudo completar la operación</p>
+        <p class="mt-1 wrap-break-word text-sm leading-relaxed">{{ error() }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- MENSAJES DE CONFIRMACIÓN -->
+  @if (mensaje()) {
+    <div role="status" class="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+      <i class="pi pi-check-circle mt-0.5 shrink-0" aria-hidden="true"></i>
+
+      <div class="min-w-0">
+        <p class="text-sm font-semibold">{{ mensaje() }}</p>
+      </div>
+    </div>
+  }
+
   @switch (pagina()) {
+
+    <!-- SEGURIDAD -->
     @case ('seguridad') {
-      <h1 class="text-3xl font-semibold text-[#002d54]">Seguridad</h1><p class="text-slate-600">Cambia tu contraseña. Al guardar se cerrará esta sesión y deberás ingresar con la nueva clave.</p>
-      <form [formGroup]="clave" (ngSubmit)="cambiarClave()" novalidate class="space-y-5 rounded-xl border bg-white p-6"><fieldset [disabled]="guardando()" class="space-y-4"><div><label for="clave-actual" class="mb-2 block text-sm font-medium">Contraseña actual</label><input pInputText id="clave-actual" type="password" formControlName="actual" autocomplete="current-password" class="w-full" /></div><div><label for="clave-nueva" class="mb-2 block text-sm font-medium">Nueva contraseña</label><input pInputText id="clave-nueva" type="password" formControlName="nueva" autocomplete="new-password" maxlength="72" class="w-full" /></div><div><label for="clave-confirmacion" class="mb-2 block text-sm font-medium">Confirmar nueva contraseña</label><input pInputText id="clave-confirmacion" type="password" formControlName="confirmacion" autocomplete="new-password" maxlength="72" class="w-full" /></div>@if (clave.controls.confirmacion.touched && clave.hasError('distintas')) { <p class="text-sm text-red-700">Las contraseñas no coinciden.</p> }</fieldset><button pButton type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Cambiar contraseña' }}</button></form>
-    }
-    @case ('preferencias') {
-      <h1 class="text-3xl font-semibold text-[#002d54]">Preferencias</h1><p class="text-slate-600">Se guardan para tu cuenta en este navegador y se aplican en todo el portal.</p>
-      <form [formGroup]="ajustes" (ngSubmit)="guardarPreferencias()" class="space-y-6 rounded-xl border border-slate-200 bg-white p-6">
 
-        <!-- TEMA -->
-        <fieldset>
-          <legend class="mb-3 text-sm font-semibold text-slate-700">Tema de la aplicación</legend>
-          <div class="grid gap-3 sm:grid-cols-3">
-            @for (t of temas; track t.valor) {
-              <label [class]="'flex cursor-pointer flex-col gap-3 rounded-xl border-2 p-4 transition-colors ' + (ajustes.controls.tema.value === t.valor ? 'border-[#0077cc] bg-sky-50' : 'border-slate-200 hover:border-sky-200')">
-                <input type="radio" formControlName="tema" [value]="t.valor" class="sr-only" />
-                <span [class]="'flex h-14 items-end gap-1.5 rounded-lg p-2 ' + t.muestra" aria-hidden="true">
-                  <span class="h-full w-4 rounded bg-[#002d54]"></span>
-                  <span [class]="'h-6 flex-1 rounded ' + t.tarjeta"></span>
-                </span>
-                <span class="flex items-center gap-2 text-sm font-semibold text-slate-800"><i [class]="t.icono"></i>{{ t.etiqueta }}</span>
-                <span class="text-xs text-slate-500">{{ t.descripcion }}</span>
-              </label>
-            }
+      <header>
+        <p class="text-xs font-semibold uppercase tracking-wider text-[#0077cc]">Configuración de cuenta</p>
+        <h1 class="mt-2 text-3xl font-bold tracking-tight text-[#002d54]">Seguridad</h1>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Administra las credenciales de acceso y protege la seguridad de tu cuenta.</p>
+      </header>
+
+      <!-- CORREO DE ACCESO (PATCH /usuarios/me, exige la contraseña actual) -->
+      <article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-5 sm:px-6">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#edf3f9] text-[#002d54]">
+            <i class="pi pi-envelope text-lg" aria-hidden="true"></i>
           </div>
-        </fieldset>
-
-        <!-- FORMATO DE FECHA -->
-        <div>
-          <label for="formato-fecha" class="mb-2 block text-sm font-semibold text-slate-700">Formato de fechas</label>
-          <select id="formato-fecha" formControlName="formato" class="w-full rounded-lg border border-slate-300 bg-white p-3">
-            <option value="dd/MM/yyyy">Día / mes / año</option>
-            <option value="yyyy-MM-dd">Año - mes - día</option>
-          </select>
-          <p class="mt-2 text-xs text-slate-500">Vista previa: <strong class="text-slate-700">{{ hoy | date:(ajustes.controls.formato.value + ' HH:mm') }}</strong></p>
+          <div class="min-w-0">
+            <h2 class="text-base font-semibold text-[#002d54]">Correo de acceso</h2>
+            <p class="mt-1 text-xs text-slate-500">Actual: <strong class="break-all text-slate-700">{{ correoActual() }}</strong></p>
+          </div>
         </div>
 
-        <!-- FILTRO DE CITAS (solo cliente) -->
+        <form [formGroup]="correo" (ngSubmit)="cambiarCorreo()" novalidate>
+          <fieldset [disabled]="guardandoCorreo()" class="flex min-w-0 flex-col gap-5 p-5 sm:p-6">
+            <div>
+              <label for="correo-nuevo" class="mb-2 block text-sm font-medium text-slate-700">Nuevo correo</label>
+              <div class="relative">
+                <i class="pi pi-at pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true"></i>
+                <input pInputText id="correo-nuevo" type="email" formControlName="nuevo" autocomplete="email" maxlength="100" placeholder="nombre@empresa.com" [attr.aria-invalid]="correo.controls.nuevo.touched && correo.controls.nuevo.invalid" class="h-11! w-full! rounded-lg! border! border-slate-300! bg-white! pl-10! pr-4! text-sm! text-slate-900! shadow-none! placeholder:text-slate-500! focus:border-[#0077cc]! focus:ring-2! focus:ring-sky-100!" />
+              </div>
+              @if (correo.controls.nuevo.touched && correo.controls.nuevo.invalid) {
+                <p class="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-700"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>Ingresa un correo válido (máx. 100 caracteres).</p>
+              }
+            </div>
+            <div>
+              <label for="correo-clave" class="mb-2 block text-sm font-medium text-slate-700">Contraseña actual</label>
+              <div class="relative">
+                <i class="pi pi-lock pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true"></i>
+                <input pInputText id="correo-clave" type="password" formControlName="actual" autocomplete="current-password" placeholder="Confirma que eres tú" class="h-11! w-full! rounded-lg! border! border-slate-300! bg-white! pl-10! pr-4! text-sm! text-slate-900! shadow-none! placeholder:text-slate-500! focus:border-[#0077cc]! focus:ring-2! focus:ring-sky-100!" />
+              </div>
+              <p class="mt-2 flex items-start gap-1.5 text-xs leading-relaxed text-slate-500"><i class="pi pi-info-circle mt-0.5 text-[11px]" aria-hidden="true"></i>Desde ahora iniciarás sesión con el nuevo correo. Tu sesión actual continúa.</p>
+            </div>
+            @if (errorCorreo()) {
+              <p role="alert" class="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"><i class="pi pi-exclamation-circle mt-0.5" aria-hidden="true"></i>{{ errorCorreo() }}</p>
+            }
+            @if (mensajeCorreo()) {
+              <p role="status" class="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"><i class="pi pi-check-circle mt-0.5" aria-hidden="true"></i>{{ mensajeCorreo() }}</p>
+            }
+          </fieldset>
+          <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+            <button type="submit" [disabled]="guardandoCorreo()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#002d54] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#004477] disabled:cursor-not-allowed disabled:opacity-50">
+              <i class="pi" [class.pi-envelope]="!guardandoCorreo()" [class.pi-spin]="guardandoCorreo()" [class.pi-spinner]="guardandoCorreo()" aria-hidden="true"></i>
+              {{ guardandoCorreo() ? 'Guardando...' : 'Cambiar correo' }}
+            </button>
+          </div>
+        </form>
+      </article>
+
+      <article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+        <!-- ENCABEZADO DEL FORMULARIO -->
+        <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-5 sm:px-6">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#edf3f9] text-[#002d54]">
+            <i class="pi pi-shield text-lg" aria-hidden="true"></i>
+          </div>
+
+          <div class="min-w-0">
+            <h2 class="text-base font-semibold text-[#002d54]">Cambiar contraseña</h2>
+            <p class="mt-1 text-xs text-slate-500">Actualiza tus credenciales de acceso.</p>
+          </div>
+        </div>
+
+        <form [formGroup]="clave" (ngSubmit)="cambiarClave()" novalidate>
+
+          <div class="flex flex-col gap-6 p-5 sm:p-6">
+
+            <!-- AVISO DE SEGURIDAD -->
+            <div class="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <i class="pi pi-info-circle mt-0.5 shrink-0 text-amber-700" aria-hidden="true"></i>
+
+              <div>
+                <p class="text-sm font-semibold text-amber-900">Se cerrará tu sesión</p>
+                <p class="mt-1 text-xs leading-relaxed text-amber-800">Después de cambiar tu contraseña, deberás iniciar sesión nuevamente con tus nuevas credenciales.</p>
+              </div>
+            </div>
+
+            <!-- CAMPOS DE CONTRASEÑA -->
+            <fieldset [disabled]="guardando()" class="flex min-w-0 flex-col gap-5">
+
+              <div>
+                <label for="clave-actual" class="mb-2 block text-sm font-medium text-slate-700">Contraseña actual</label>
+
+                <div class="relative">
+                  <i class="pi pi-lock pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true"></i>
+
+                  <input pInputText id="clave-actual" type="password" formControlName="actual" autocomplete="current-password" placeholder="Ingresa tu contraseña actual" class="h-11! w-full! rounded-lg! border! border-slate-300! bg-white! pl-10! pr-4! text-sm! text-slate-900! shadow-none! placeholder:text-slate-500! focus:border-[#0077cc]! focus:ring-2! focus:ring-sky-100!" />
+                </div>
+              </div>
+
+              <div>
+                <label for="clave-nueva" class="mb-2 block text-sm font-medium text-slate-700">Nueva contraseña</label>
+
+                <div class="relative">
+                  <i class="pi pi-key pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true"></i>
+
+                  <input pInputText id="clave-nueva" type="password" formControlName="nueva" autocomplete="new-password" maxlength="72" placeholder="Ingresa tu nueva contraseña" class="h-11! w-full! rounded-lg! border! border-slate-300! bg-white! pl-10! pr-4! text-sm! text-slate-900! shadow-none! placeholder:text-slate-500! focus:border-[#0077cc]! focus:ring-2! focus:ring-sky-100!" />
+                </div>
+
+                <p class="mt-2 flex items-start gap-1.5 text-xs leading-relaxed text-slate-500">
+                  <i class="pi pi-info-circle mt-0.5 text-[11px]" aria-hidden="true"></i>
+                  Utiliza una contraseña segura y diferente de las que usas en otros servicios.
+                </p>
+              </div>
+
+              <div>
+                <label for="clave-confirmacion" class="mb-2 block text-sm font-medium text-slate-700">Confirmar nueva contraseña</label>
+
+                <div class="relative">
+                  <i class="pi pi-lock pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true"></i>
+
+                  <input pInputText id="clave-confirmacion" type="password" formControlName="confirmacion" autocomplete="new-password" maxlength="72" placeholder="Repite tu nueva contraseña" [attr.aria-invalid]="clave.controls.confirmacion.touched && clave.hasError('distintas')" [attr.aria-describedby]="clave.controls.confirmacion.touched && clave.hasError('distintas') ? 'error-confirmacion' : null" class="h-11! w-full! rounded-lg! border! border-slate-300! bg-white! pl-10! pr-4! text-sm! text-slate-900! shadow-none! placeholder:text-slate-500! focus:border-[#0077cc]! focus:ring-2! focus:ring-sky-100!" [class.border-red-500!]="clave.controls.confirmacion.touched && clave.hasError('distintas')" />
+                </div>
+
+                @if (clave.controls.confirmacion.touched && clave.hasError('distintas')) {
+                  <p id="error-confirmacion" class="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-700">
+                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+                    Las contraseñas no coinciden.
+                  </p>
+                }
+              </div>
+
+            </fieldset>
+          </div>
+
+          <!-- ACCIONES -->
+          <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+            <button type="submit" [disabled]="guardando()" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#002d54] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#004477] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#002d54] disabled:cursor-not-allowed disabled:opacity-50">
+              <i class="pi" [class.pi-shield]="!guardando()" [class.pi-spin]="guardando()" [class.pi-spinner]="guardando()" aria-hidden="true"></i>
+              {{ guardando() ? 'Guardando...' : 'Cambiar contraseña' }}
+            </button>
+          </div>
+
+        </form>
+      </article>
+    }
+
+    <!-- PREFERENCIAS -->
+    @case ('preferencias') {
+
+      <header>
+        <p class="text-xs font-semibold uppercase tracking-wider text-[#0077cc]">Configuración de cuenta</p>
+        <h1 class="mt-2 text-3xl font-bold tracking-tight text-[#002d54]">Preferencias</h1>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Personaliza tu experiencia dentro del portal según tus necesidades.</p>
+      </header>
+
+      <form [formGroup]="ajustes" (ngSubmit)="guardarPreferencias()" class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+        <!-- APARIENCIA -->
+        <div class="border-b border-slate-100 p-5 sm:p-6">
+
+          <div class="mb-5 flex items-center gap-3">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#edf3f9] text-[#002d54]">
+              <i class="pi pi-palette text-lg" aria-hidden="true"></i>
+            </div>
+
+            <div>
+              <h2 class="text-base font-semibold text-[#002d54]">Apariencia</h2>
+              <p class="mt-1 text-xs text-slate-500">Elige cómo quieres visualizar la aplicación.</p>
+            </div>
+          </div>
+
+          <fieldset class="min-w-0">
+            <legend class="mb-3 text-sm font-medium text-slate-700">Tema de la aplicación</legend>
+
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              @for (t of temas; track t.valor) {
+
+                <label class="relative flex cursor-pointer flex-col gap-3 rounded-xl border-2 p-3 transition-all focus-within:ring-2 focus-within:ring-sky-300 focus-within:ring-offset-2" [class.border-[#0077cc]]="ajustes.controls.tema.value === t.valor" [class.bg-sky-50]="ajustes.controls.tema.value === t.valor" [class.border-slate-200]="ajustes.controls.tema.value !== t.valor" [class.hover:border-slate-300]="ajustes.controls.tema.value !== t.valor">
+
+                  <input type="radio" formControlName="tema" [value]="t.valor" class="sr-only" />
+
+                  <!-- VISTA PREVIA DEL TEMA -->
+                  <div [class]="'flex h-24 gap-2 overflow-hidden rounded-lg border border-black/5 p-2 ' + t.muestra" aria-hidden="true">
+
+                    <div class="flex w-6 shrink-0 flex-col gap-2 rounded bg-[#002d54] p-1.5">
+                      <span class="h-1.5 w-full rounded-sm bg-white/70"></span>
+                      <span class="h-1 w-full rounded-sm bg-white/30"></span>
+                      <span class="h-1 w-full rounded-sm bg-white/30"></span>
+                      <span class="h-1 w-full rounded-sm bg-white/30"></span>
+                    </div>
+
+                    <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+                      <div [class]="'h-3 rounded-sm ' + t.tarjeta"></div>
+                      <div [class]="'flex-1 rounded-sm ' + t.tarjeta"></div>
+
+                      <div class="grid flex-1 grid-cols-2 gap-1.5">
+                        <div [class]="'rounded-sm ' + t.tarjeta"></div>
+                        <div [class]="'rounded-sm ' + t.tarjeta"></div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- NOMBRE DEL TEMA -->
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                      <i [class]="t.icono" aria-hidden="true"></i>
+                      {{ t.etiqueta }}
+                    </span>
+
+                    @if (ajustes.controls.tema.value === t.valor) {
+                      <i class="pi pi-check-circle text-[#0077cc]" aria-hidden="true"></i>
+                    } @else {
+                      <span class="h-4 w-4 shrink-0 rounded-full border border-slate-300" aria-hidden="true"></span>
+                    }
+                  </div>
+
+                  <span class="-mt-1 text-xs leading-relaxed text-slate-500">{{ t.descripcion }}</span>
+
+                </label>
+              }
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- FORMATO REGIONAL -->
+        <div class="border-b border-slate-100 p-5 sm:p-6">
+
+          <div class="mb-5 flex items-center gap-3">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#edf3f9] text-[#002d54]">
+              <i class="pi pi-calendar text-lg" aria-hidden="true"></i>
+            </div>
+
+            <div>
+              <h2 class="text-base font-semibold text-[#002d54]">Formato regional</h2>
+              <p class="mt-1 text-xs text-slate-500">Personaliza la visualización de las fechas.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 items-end gap-4 sm:grid-cols-2">
+
+            <div class="min-w-0">
+              <label for="formato-fecha" class="mb-2 block text-sm font-medium text-slate-700">Formato de fechas</label>
+
+              <div class="relative">
+                <select id="formato-fecha" formControlName="formato" class="h-11 w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 pr-10 text-sm text-slate-800 outline-none transition-colors focus:border-[#0077cc] focus:ring-2 focus:ring-sky-100">
+                  <option value="dd/MM/yyyy">Día / mes / año</option>
+                  <option value="yyyy-MM-dd">Año - mes - día</option>
+                </select>
+
+                <i class="pi pi-chevron-down pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500" aria-hidden="true"></i>
+              </div>
+            </div>
+
+            <!-- VISTA PREVIA DE FECHA -->
+            <div class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+              <p class="text-xs font-medium text-slate-500">Vista previa</p>
+
+              <div class="mt-1 flex items-center gap-2">
+                <i class="pi pi-clock text-xs text-[#0077cc]" aria-hidden="true"></i>
+
+                <span class="text-sm font-semibold tabular-nums text-[#002d54]">
+                  {{ hoy | date:(ajustes.controls.formato.value + ' HH:mm') }}
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PREFERENCIAS DE CITAS -->
         @if (esCliente()) {
-          <div>
-            <label for="citas-predeterminadas" class="mb-2 block text-sm font-semibold text-slate-700">Filtro inicial de citas</label>
-            <select id="citas-predeterminadas" formControlName="citasEstado" class="w-full rounded-lg border border-slate-300 bg-white p-3"><option value="TODAS">Todas</option><option value="PROGRAMADA">Programadas</option><option value="EN_CURSO">En curso</option><option value="FINALIZADA">Finalizadas</option><option value="CANCELADA">Canceladas</option></select>
+          <div class="border-b border-slate-100 p-5 sm:p-6">
+
+            <div class="mb-5 flex items-center gap-3">
+              <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#edf3f9] text-[#002d54]">
+                <i class="pi pi-calendar-clock text-lg" aria-hidden="true"></i>
+              </div>
+
+              <div>
+                <h2 class="text-base font-semibold text-[#002d54]">Preferencias de citas</h2>
+                <p class="mt-1 text-xs text-slate-500">Configura cómo se muestra inicialmente tu listado de citas.</p>
+              </div>
+            </div>
+
+            <div>
+              <label for="citas-predeterminadas" class="mb-2 block text-sm font-medium text-slate-700">Filtro inicial de citas</label>
+
+              <div class="relative">
+                <select id="citas-predeterminadas" formControlName="citasEstado" class="h-11 w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 pr-10 text-sm text-slate-800 outline-none transition-colors focus:border-[#0077cc] focus:ring-2 focus:ring-sky-100">
+                  <option value="TODAS">Todas</option>
+                  <option value="PROGRAMADA">Programadas</option>
+                  <option value="EN_CURSO">En curso</option>
+                  <option value="FINALIZADA">Finalizadas</option>
+                  <option value="CANCELADA">Canceladas</option>
+                </select>
+
+                <i class="pi pi-chevron-down pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500" aria-hidden="true"></i>
+              </div>
+
+              <p class="mt-2 text-xs leading-relaxed text-slate-500">Este filtro se aplicará al ingresar al listado de citas.</p>
+            </div>
+
           </div>
         }
 
-        <button pButton type="submit">Guardar preferencias</button>
+        <!-- INFORMACIÓN DE GUARDADO AUTOMÁTICO -->
+        <div class="px-5 py-4 sm:px-6">
+          <div class="flex items-start gap-3 rounded-lg border border-sky-100 bg-sky-50/70 p-3.5">
+            <i class="pi pi-info-circle mt-0.5 shrink-0 text-[#0077cc]" aria-hidden="true"></i>
+
+            <div>
+              <p class="text-xs font-semibold text-[#002d54]">Guardado automático</p>
+              <p class="mt-1 text-xs leading-relaxed text-slate-600">Los cambios se aplican al instante en todo el portal y se guardan para tu cuenta en este navegador.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 bg-slate-50/70 px-5 py-4 sm:px-6">
+
+          <span role="status" aria-live="polite" class="inline-flex items-center gap-2 text-xs font-medium text-emerald-700">
+            @if (guardado()) {
+              <i class="pi pi-check-circle" aria-hidden="true"></i>
+              Cambios guardados
+            }
+          </span>
+
+          <button type="button" (click)="restablecer()" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0077cc]">
+            <i class="pi pi-refresh text-xs" aria-hidden="true"></i>
+            Restablecer valores
+          </button>
+
+        </div>
+
       </form>
     }
+
+    <!-- CENTRO DE AYUDA -->
     @case ('ayuda') {
-      <h1 class="text-3xl font-semibold text-[#002d54]">Centro de ayuda</h1><div class="space-y-4 rounded-xl border bg-white p-6"><details open><summary class="cursor-pointer font-semibold">¿Cómo registro un pedido?</summary><p class="mt-3 text-sm text-slate-600">En Pedidos → Crear pedido, selecciona fecha, prioridad, productos y cantidades. Al registrar recibirás un identificador y podrás consultar el detalle.</p><a routerLink="/cliente/pedidos/nuevo" class="mt-2 inline-block text-sm text-sky-700">Crear pedido</a></details><details><summary class="cursor-pointer font-semibold">¿Dónde consulto mi programación?</summary><p class="mt-3 text-sm text-slate-600">En Citas aparecen las atenciones asociadas a tus pedidos, con su horario y estado. Una atención FINALIZADA no sustituye al estado de entrega del pedido.</p><a routerLink="/cliente/citas" class="mt-2 inline-block text-sm text-sky-700">Consultar citas</a></details><details><summary class="cursor-pointer font-semibold">¿Puedo cancelar un pedido?</summary><p class="mt-3 text-sm text-slate-600">Abre el detalle en Mis pedidos. Si el pedido está RECIBIDO o EN_PREPARACION, puedes registrar un motivo y confirmar su cancelación. Una vez DESPACHADO ya no se puede cancelar.</p></details><details><summary class="cursor-pointer font-semibold">¿Cómo actualizo mis datos?</summary><p class="mt-3 text-sm text-slate-600">En Mi perfil selecciona Editar datos. Guarda los cambios para actualizar la razón social, RUC, teléfono o dirección de tu empresa.</p><a routerLink="/cliente/perfil" class="mt-2 inline-block text-sm text-sky-700">Mi perfil</a></details></div>
+
+      <header>
+        <p class="text-xs font-semibold uppercase tracking-wider text-[#0077cc]">Soporte</p>
+        <h1 class="mt-2 text-3xl font-bold tracking-tight text-[#002d54]">Centro de ayuda</h1>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Encuentra respuestas a las preguntas más frecuentes sobre el uso del portal.</p>
+      </header>
+
+      <article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+        <!-- ENCABEZADO -->
+        <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-5 sm:px-6">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#edf3f9] text-[#002d54]">
+            <i class="pi pi-question-circle text-lg" aria-hidden="true"></i>
+          </div>
+
+          <div>
+            <h2 class="text-base font-semibold text-[#002d54]">Preguntas frecuentes</h2>
+            <p class="mt-1 text-xs text-slate-500">Información y orientación para utilizar el portal.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3 p-5 sm:p-6">
+
+          <!-- REGISTRAR PEDIDO -->
+          <details open class="group overflow-hidden rounded-lg border border-slate-200 transition-colors open:border-sky-200 open:bg-sky-50/30">
+
+            <summary class="flex cursor-pointer list-none items-center gap-3 px-4 py-4 text-sm font-semibold text-slate-800 outline-none transition-colors hover:bg-slate-50 focus-visible:bg-sky-50 [&::-webkit-details-marker]:hidden">
+              <i class="pi pi-shopping-cart shrink-0 text-[#0077cc]" aria-hidden="true"></i>
+
+              <span class="flex-1">¿Cómo registro un pedido?</span>
+
+              <i class="pi pi-chevron-down shrink-0 text-xs text-slate-500 transition-transform duration-200 group-open:rotate-180" aria-hidden="true"></i>
+            </summary>
+
+            <div class="border-t border-slate-100 px-4 py-4 sm:pl-11">
+              <p class="text-sm leading-7 text-slate-600">En <strong class="font-semibold text-slate-800">Pedidos → Crear pedido</strong>, selecciona fecha, prioridad, productos y cantidades. Al registrar recibirás un identificador y podrás consultar el detalle.</p>
+
+              <a routerLink="/cliente/pedidos/nuevo" class="mt-4 inline-flex items-center gap-2 rounded-md text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0077cc]">
+                Crear pedido
+                <i class="pi pi-arrow-right text-xs" aria-hidden="true"></i>
+              </a>
+            </div>
+
+          </details>
+
+          <!-- CONSULTAR PROGRAMACIÓN -->
+          <details class="group overflow-hidden rounded-lg border border-slate-200 transition-colors open:border-sky-200 open:bg-sky-50/30">
+
+            <summary class="flex cursor-pointer list-none items-center gap-3 px-4 py-4 text-sm font-semibold text-slate-800 outline-none transition-colors hover:bg-slate-50 focus-visible:bg-sky-50 [&::-webkit-details-marker]:hidden">
+              <i class="pi pi-calendar shrink-0 text-[#0077cc]" aria-hidden="true"></i>
+
+              <span class="flex-1">¿Dónde consulto mi programación?</span>
+
+              <i class="pi pi-chevron-down shrink-0 text-xs text-slate-500 transition-transform duration-200 group-open:rotate-180" aria-hidden="true"></i>
+            </summary>
+
+            <div class="border-t border-slate-100 px-4 py-4 sm:pl-11">
+              <p class="text-sm leading-7 text-slate-600">En <strong class="font-semibold text-slate-800">Citas</strong> aparecen las atenciones asociadas a tus pedidos, con su horario y estado.</p>
+
+              <div class="mt-3 flex items-start gap-2 rounded-md border border-sky-100 bg-sky-50 p-3 text-xs leading-relaxed text-sky-900">
+                <i class="pi pi-info-circle mt-0.5 shrink-0" aria-hidden="true"></i>
+                Una atención finalizada no sustituye al estado de entrega del pedido.
+              </div>
+
+              <a routerLink="/cliente/citas" class="mt-4 inline-flex items-center gap-2 rounded-md text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0077cc]">
+                Consultar citas
+                <i class="pi pi-arrow-right text-xs" aria-hidden="true"></i>
+              </a>
+            </div>
+
+          </details>
+
+          <!-- CANCELAR PEDIDO -->
+          <details class="group overflow-hidden rounded-lg border border-slate-200 transition-colors open:border-sky-200 open:bg-sky-50/30">
+
+            <summary class="flex cursor-pointer list-none items-center gap-3 px-4 py-4 text-sm font-semibold text-slate-800 outline-none transition-colors hover:bg-slate-50 focus-visible:bg-sky-50 [&::-webkit-details-marker]:hidden">
+              <i class="pi pi-times-circle shrink-0 text-[#0077cc]" aria-hidden="true"></i>
+
+              <span class="flex-1">¿Puedo cancelar un pedido?</span>
+
+              <i class="pi pi-chevron-down shrink-0 text-xs text-slate-500 transition-transform duration-200 group-open:rotate-180" aria-hidden="true"></i>
+            </summary>
+
+            <div class="border-t border-slate-100 px-4 py-4 sm:pl-11">
+              <p class="text-sm leading-7 text-slate-600">Abre el detalle en <strong class="font-semibold text-slate-800">Mis pedidos</strong>. Si el pedido está en alguno de los siguientes estados, puedes registrar un motivo y confirmar su cancelación:</p>
+
+              <div class="mt-3 flex flex-wrap gap-2">
+                <span class="inline-flex items-center gap-1.5 rounded-md bg-sky-100 px-2.5 py-1 text-xs font-medium text-sky-800">
+                  <span class="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true"></span>
+                  Recibido
+                </span>
+
+                <span class="inline-flex items-center gap-1.5 rounded-md bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+                  <span class="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true"></span>
+                  En preparación
+                </span>
+              </div>
+
+              <div class="mt-4 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">
+                <i class="pi pi-exclamation-triangle mt-0.5 shrink-0" aria-hidden="true"></i>
+                Una vez despachado, el pedido ya no se puede cancelar.
+              </div>
+            </div>
+
+          </details>
+
+          <!-- ACTUALIZAR DATOS -->
+          <details class="group overflow-hidden rounded-lg border border-slate-200 transition-colors open:border-sky-200 open:bg-sky-50/30">
+
+            <summary class="flex cursor-pointer list-none items-center gap-3 px-4 py-4 text-sm font-semibold text-slate-800 outline-none transition-colors hover:bg-slate-50 focus-visible:bg-sky-50 [&::-webkit-details-marker]:hidden">
+              <i class="pi pi-user-edit shrink-0 text-[#0077cc]" aria-hidden="true"></i>
+
+              <span class="flex-1">¿Cómo actualizo mis datos?</span>
+
+              <i class="pi pi-chevron-down shrink-0 text-xs text-slate-500 transition-transform duration-200 group-open:rotate-180" aria-hidden="true"></i>
+            </summary>
+
+            <div class="border-t border-slate-100 px-4 py-4 sm:pl-11">
+              <p class="text-sm leading-7 text-slate-600">En <strong class="font-semibold text-slate-800">Mi perfil</strong> selecciona Editar datos. Guarda los cambios para actualizar la razón social, RUC, teléfono o dirección de tu empresa.</p>
+
+              <a routerLink="/cliente/perfil" class="mt-4 inline-flex items-center gap-2 rounded-md text-sm font-semibold text-[#0077cc] transition-colors hover:text-[#002d54] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0077cc]">
+                Ir a mi perfil
+                <i class="pi pi-arrow-right text-xs" aria-hidden="true"></i>
+              </a>
+            </div>
+
+          </details>
+
+        </div>
+
+      </article>
     }
   }
+
 </section>
